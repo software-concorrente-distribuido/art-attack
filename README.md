@@ -1,11 +1,13 @@
-Membros do grupo:
+# Grupo: Art attack
 
-Bruna
+### Membros do grupo:
 
-Guilherme
+- Bruna
 
-João Gabriel
+- Guilherme
 
-Karlla
+- João Gabriel
 
-Luiz Felipe Pires
+- Karlla
+
+- Luiz Felipe Pires
