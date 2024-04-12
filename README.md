@@ -1,7 +1,11 @@
 Membros do grupo:
 
-Bruna 
+Bruna
+
 Guilherme
+
 João Gabriel
+
 Karlla
+
 Luiz Felipe Pires
