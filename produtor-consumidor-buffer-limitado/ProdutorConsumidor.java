@@ -1,6 +1,6 @@
+
 import java.util.Queue;
 import java.util.LinkedList;
-import java.util.concurrent.ThreadLocalRandom;
 
 /*
     Este código implementa o problema do produtor-consumidor em Java. O cenário
@@ -23,7 +23,7 @@ public class ProdutorConsumidor {
     //Inicia várias threads de download e uma thread de escrita em disco.
     public static void main(String[] args) {
         Thread[] downloadThreads = new Thread[NUM_DOWNLOAD_THREADS];
-        Thread writerThread = new Thread(Main::writer);
+        Thread writerThread = new Thread(ProdutorConsumidor::writer);
 
         for (int i = 0; i < NUM_DOWNLOAD_THREADS; i++) {
             final int threadId = i;

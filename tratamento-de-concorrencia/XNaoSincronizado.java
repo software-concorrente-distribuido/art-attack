@@ -1,13 +1,14 @@
-class X {
-    private int lastIdUsed;
 
-    public int getNextId(String t) {
-        System.out.println("Chamado por: " + t + " - Last id used: " + lastIdUsed);
-        return ++lastIdUsed;
-    }
-}
 
 class XNaoSincronizado{
+    static class X {
+        private int lastIdUsed;
+
+        public int getNextId(String t) {
+            System.out.println("Chamado por: " + t + " - Last id used: " + lastIdUsed);
+            return ++lastIdUsed;
+        }
+    }
     public static void main(String[] args) {
         final X obj = new X();
 
