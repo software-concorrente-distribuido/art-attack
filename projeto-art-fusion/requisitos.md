@@ -76,6 +76,8 @@ A equipe de desenvolvimento do Art Fusion é formada pelos seguintes membros e s
 - Karlla Loane: analista de requisitos e programadora front-end.
 - Luiz Felipe Pires: gerente de projetos e arquiteto de software.
 
+---
+
 <div id='levantamentoreq'/>
  
 # Levantamento de Requisitos
@@ -158,6 +160,10 @@ A equipe de desenvolvimento do Art Fusion é formada pelos seguintes membros e s
 ### Escalabilidade
 - **RNF08**: O sistema deve ser projetado com uma arquitetura distribuída, permitindo que diferentes componentes sejam executados em servidores distintos, proporcionando maior escalabilidade e redundância.
 
+--- 
+
 <div id='arquitetura'/>
 
 # Arquitetura
+
+---
