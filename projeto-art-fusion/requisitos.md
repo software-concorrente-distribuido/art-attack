@@ -49,19 +49,81 @@ A equipe de desenvolvimento do Art Fusion é formada pelos seguintes membros e s
 # Levantamento de Requisitos
 
 ## Épicos
-- Épico 1
+- Épico 1: Karlla, uma entusiasta das artes plásticas, gostaria de ingressar em uma carreira de desenhista, mas encontra dificuldades de utilizar as mesmas plataformas que outros artistas mais experientes pela grande curva de habilidade requerida e pela falta de feedback recebida em suas produções quando posta em suas redes sociais.
 
-- Épico 2...
+- Épico 2: João e Guilherme, acostumados a desenvolver designs de alto nível decidem produzir um trabalho juntos para uma pesquisa estudantil, porém a troca de estilos e de resultados desencoraja que ambos trabalhem nesse projeto de suas casas, obrigando-os a passar noites na biblioteca de sua instituição.
+
+- Épico 3: Bruna, uma artista já consolidada, está passando por um período de bloqueio criativo e busca inspiração em paisagens e desenhos que lembram o começo de sua carreira, tanto em técnica quanto em liberdade com seu tema assinatura. Porém sofre para encontrar artes mais simples e rudimentares que fujam dos algoritmos de relevância das redes.
+
+- Épico 4: Luiz busca formas de pintar que instiguem sua liberdade natural e personalidade comunicativa, mas não gosta da abordagem que enfrenta nas redes sociais que limita o artista e o público a interagir apenas após o ato da postagem de esboços ou da obra completa.
+
 
 
 ## Histórias de Usuário
 
+HU01 - Como usuário, desejo poder fazer login com meu e-mail e senha para  salvar meus projetos e preferências.
+
+HU02 - Como usuário, quero catalogar minhas criações por meio de tags para direcioná-las ao público e  a interações específicas.
+
+HU03 - Como usuário, quero publicar meus esboços para  compartilhá-los com outros usuários interessados.
+
+HU04 - Como usuário, quero salvar meus esboços em um espaço privado para ser visualizado apenas por mim.
+
+HU05 - Como usuário, quero poder alterar o modo de visualização de minhas obras para disponibilizá-las  para visualização ou mantê-las privadas.
+
+HU06 - Como usuário, quero alterar o modo de interação de minhas obras para permitir ou restringir a colaboração de outros artistas.
+
+HU07 - Como usuário, quero ser capaz de visualizar projetos de outros criadores por meio de um espaço de descoberta para colaborar com outras obras ou buscar inspirações.
+
+HU08 - Como usuário, quero interagir com projetos de outros usuários para colaborar com obras e participar ativamente da comunidade da plataforma. 
+
+HU09 - Como usuário, quero compartilhar projetos com outros usuários por e-mail para restringir o acesso apenas a artistas selecionados.
+
+HU10 - Como usuário, quero visualizar minhas obras criadas para revisar meu progresso e compartilhá-las com outros usuários da plataforma.
+
+HU11 - Como usuário, quero colaborar em tempo real com outros artistas na criação de obras de arte digital para facilitar a colaboração remota e simultânea.
+
+HU12 - Como usuário, quero que minhas alterações nos projetos sejam refletidas para outros colaboradores, para manter a sincronização e coesão entre os membros da equipe.
+
 ## Requisitos Funcionais
-|**ID**|**Definição**|
-|--|---------|
-|RF01|defina o requisito aqui|
+
+|**RF01**| **O sistema deve permitir que os usuários façam login utilizando e-mail e senha.** |
+
+|**RF02**| **Os usuários devem poder se cadastrar no sistema fornecendo informações básicas, como nome, e-mail e senha.** |
+
+|**RF03**| **Os usuários devem ser capazes de criar desenhos digitais usando ferramentas como pinceis, lápis, borracha e formas geométricas.** |
+
+|**RF04**| **O sistema deve permitir a seleção de diferentes tamanhos de pincéis,  espessuras de linhas e cores.** |
+
+|**RF05**| **Os desenhos criados devem ser salvos em formato de arquivo (por exemplo, PNG, JPEG).** |
+
+|**RF06**| **O sistema deve manter um histórico de alterações de cada obra para que os usuários possam revisitar e restaurar versões anteriores conforme necessário.** |
+
+|**RF07**| **O sistema deve permitir que os usuários explorem uma galeria de arte compartilhada para visualizar e editar obras de outros usuários.** |
+
+|**RF08**| **O sistema deve permitir aos criadores de projeto convidar outros usuários específicos para colaborar em suas obras de arte, concedendo-lhes acesso com base em convites individuais.** |
+
+|**RF09**| **O sistema deve permitir que os usuários alterem a permissão de visualização da obra, podendo escolher entre opções como privado (visível apenas para o criador) e público (visível para todos os usuários da plataforma).** |
+
+|**RF10**| **O sistema deve permitir que os usuários alterem a permissão de colaboração da obra, podendo escolher entre opções como privada (apenas o criador pode editar) e pública (qualquer usuário pode editar).** |
 
 ## Requisitos Não Funcionais
 
 ### Categoria do RNF
-- RNF01: 
+**Desempenho**
+ |**RNF01**| O sistema deve responder a alterações nas obras em 0,5 segundos.|
+ |**RNF02**| O sistema deve sincronizar as alterações entre os usuários em 1,5 segundos (considerando uma boa conectividade de internet). |
+ |**RNF03**| O sistema deve suportar a colaboração em tempo real entre 5 usuários simultaneamente. |
+
+**Usabilidade:**
+ |**RNF04**| O sistema deve possuir uma interface intuitiva e de fácil utilização, permitindo que usuários de diferentes níveis de habilidade interajam de forma eficaz com as ferramentas de desenho e pintura. |
+ |**RNF05**| O sistema deve garantir que as edições feitas por diferentes usuários no mesmo projeto sejam sincronizadas de forma consistente e sem conflitos. |
+
+**Confiabilidade:**
+ |**RNF06**| O sistema deve estar disponível 99% do tempo. |
+
+**Portabilidade:**
+ |**RNF07**| O software deve ser compatível com os principais navegadores (Chrome, Firefox, Edge). |
+
+**Escalabilidade:**
+ |**RNF08**| O sistema deve ser projetado com uma arquitetura distribuída, permitindo que diferentes componentes sejam executados em servidores distintos, proporcionando maior escalabilidade e redundância. |
