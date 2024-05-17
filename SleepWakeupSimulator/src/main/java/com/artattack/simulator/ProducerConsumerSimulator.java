@@ -173,9 +173,8 @@ public class ProducerConsumerSimulator extends Application {
     private void executeProducerCode() {
 
         int toBeExecuted = 0;
-        //statusLabelProducer.setText("Executando.");
 
-        //System.out.println("producerCodeTexts.length + " + producerCodeTexts.length);
+        statusLabelProducer.setText("Executando.");
 
         // Se a linha atual for -1 ou a última linha, reinicia a execução do código
         if (producerLineNumber == -1 || producerLineNumber == producerCodeTexts.length) {
@@ -194,8 +193,6 @@ public class ProducerConsumerSimulator extends Application {
             clicProducer = 0;
             updateCodeHighlights(producerCodeTexts, producerLineNumber, Color.BLUE);
         }
-
-        //System.out.println("linha = " + producerLineNumber);
 
         // Executa a lógica correspondente à linha atual
         switch (producerLineNumber) {
@@ -265,7 +262,7 @@ public class ProducerConsumerSimulator extends Application {
 
     private void executeConsumerCode() {
 
-        //statusLabelConsumer.setText("Executando.");
+        statusLabelConsumer.setText("Executando.");
         int toBeExecuted = 0;
 
         // Se a linha atual for -1 ou a última linha, reinicia a execução do código
