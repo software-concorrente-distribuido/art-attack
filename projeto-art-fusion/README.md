@@ -3,6 +3,7 @@
 
 ### Rodar backend:
 
+- JDK 21
 - Tenha um postgres com um banco de dados chamado "art-attack" criado.
 - Crie um arquivo chamado `application-dev.properties` e coloque as seguintes configurações nele:
 	spring.datasource.username=<seu_username_local> 
