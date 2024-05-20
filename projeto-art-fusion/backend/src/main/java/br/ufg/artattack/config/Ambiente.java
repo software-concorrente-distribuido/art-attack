@@ -1,12 +1,14 @@
 package br.ufg.artattack.config;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @ConfigurationProperties(prefix = "art-attack")
 @Configuration
 @Getter
+@Setter
 public class Ambiente {
 
 
@@ -14,13 +16,6 @@ public class Ambiente {
 
     private String nomeAplicacao;
 
-    public void setNomeAplicacao(String valor) {
+    private Boolean mvc;
 
-        this.nomeAplicacao = valor;
-    }
-
-    public void setChaveSecreta(String valor) {
-
-        this.chaveSecreta = valor;
-    }
 }

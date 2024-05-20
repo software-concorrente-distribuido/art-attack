@@ -23,6 +23,11 @@ public class AutenticacaoConfiguracoes {
 
     @Autowired
     private FiltroAPI securityFilter;
+
+
+    @Autowired
+    private Ambiente ambiente;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -30,9 +35,10 @@ public class AutenticacaoConfiguracoes {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(it->{
-                it.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll();
-                    it.requestMatchers(HttpMethod.GET, "/api/**").denyAll(); // nega todas as outras URLs que começam com /api
-                    it.requestMatchers(HttpMethod.GET, "/**").permitAll();
+                    it.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll();
+                    it.requestMatchers(HttpMethod.GET, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
+                    if(ambiente.getMvc())
+                        it.requestMatchers(HttpMethod.GET, "/**").permitAll();
                     it.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

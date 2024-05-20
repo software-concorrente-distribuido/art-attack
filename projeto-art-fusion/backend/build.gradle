@@ -35,6 +35,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'com.auth0:java-jwt:4.4.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.1'
+
 }
 
 task copyStaticFiles(type: Copy) {

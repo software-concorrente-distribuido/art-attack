@@ -1,7 +1,7 @@
 package br.ufg.artattack;
 
-import br.ufg.artattack.modelo.Cliente;
-import br.ufg.artattack.repositorio.ClienteRepositorio;
+import br.ufg.artattack.modelo.Usuario;
+import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -15,17 +15,17 @@ public class ArtAttackApplication {
     }
 
     @Autowired
-    ClienteRepositorio clienteRepositorio;
+    UsuarioRepositorio usuarioRepositorio;
     @PostConstruct
     public void gerarDados(){
-        if(!clienteRepositorio.findAll().isEmpty()) return;
-        var cliente = new Cliente();
+        if(!usuarioRepositorio.findAll().isEmpty()) return;
+        var cliente = new Usuario();
         cliente.setCpf("061.085.541-77");
         cliente.nome = "João Gabriel Tavares";
         cliente.email = "joao@gmail.com";
         cliente.setSenha("$2a$12$xiQJXM2SGyP5r2FevTXGcevF.KU5G.GtdE/zzktHB.5ldWamg2M.m");//senha123
         cliente.setAtivo(true);
-        clienteRepositorio.save(cliente);
+        usuarioRepositorio.save(cliente);
     }
 
 }

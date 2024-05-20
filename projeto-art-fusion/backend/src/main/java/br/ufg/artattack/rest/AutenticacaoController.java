@@ -1,9 +1,9 @@
 package br.ufg.artattack.rest;
 
-import br.ufg.artattack.modelo.Cliente;
-import br.ufg.artattack.rest.dto.AutenticacaoDTO;
-import br.ufg.artattack.rest.dto.ClienteDTO;
-import br.ufg.artattack.servico.ClienteServico;
+import br.ufg.artattack.modelo.Usuario;
+import br.ufg.artattack.rest.dto.LoginRequestDTO;
+import br.ufg.artattack.rest.dto.UsuarioDTO;
+import br.ufg.artattack.servico.UsuarioServico;
 import br.ufg.artattack.servico.JWTServico;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AutenticacaoController {
 
     @Autowired
-    ClienteServico clienteServico;
+    UsuarioServico usuarioServico;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -30,12 +30,12 @@ public class AutenticacaoController {
 
 
     @PostMapping("/login")
-    public ResponseEntity conseguirToken(@RequestBody @Valid AutenticacaoDTO authDTO){
+    public ResponseEntity conseguirToken(@RequestBody @Valid LoginRequestDTO authDTO){
 
         var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(),authDTO.getSenha()));
 
-        if(auth.getPrincipal() instanceof Cliente cliente)
-            return ResponseEntity.ok().body(jwtServico.gerarJWT(new ClienteDTO(cliente)));
+        if(auth.getPrincipal() instanceof Usuario usuario)
+            return ResponseEntity.ok().body(jwtServico.gerarJWT(new UsuarioDTO(usuario)));
         else
             return ResponseEntity.internalServerError().build();
     }

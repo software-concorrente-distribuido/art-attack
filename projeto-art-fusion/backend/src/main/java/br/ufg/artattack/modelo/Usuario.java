@@ -12,17 +12,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity(name = "cliente")
+@Entity(name = "usuario")
 @NoArgsConstructor
-
-public class Cliente extends EntidadeJPA implements UserDetails {
+public class Usuario extends EntidadeJPA implements UserDetails {
 
     @Column(nullable = false)
     public String email;
 
     public String nome;
 
-    @Column(nullable = true,length = 11)
+    @Column(length = 11)
     @Getter
     private String cpf;
 
