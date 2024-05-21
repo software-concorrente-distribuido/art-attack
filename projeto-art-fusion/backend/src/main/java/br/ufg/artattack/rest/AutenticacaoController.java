@@ -1,8 +1,8 @@
 package br.ufg.artattack.rest;
 
 import br.ufg.artattack.modelo.Usuario;
-import br.ufg.artattack.rest.dto.LoginRequestDTO;
-import br.ufg.artattack.rest.dto.UsuarioDTO;
+import br.ufg.artattack.dto.LoginRequestDTO;
+import br.ufg.artattack.dto.UsuarioDTO;
 import br.ufg.artattack.servico.UsuarioServico;
 import br.ufg.artattack.servico.JWTServico;
 import jakarta.validation.Valid;

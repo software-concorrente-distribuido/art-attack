@@ -1,4 +1,4 @@
-package br.ufg.artattack.rest.dto;
+package br.ufg.artattack.dto;
 
 import lombok.Getter;
 import br.ufg.artattack.modelo.Usuario;

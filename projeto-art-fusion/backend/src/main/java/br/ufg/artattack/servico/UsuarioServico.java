@@ -3,7 +3,7 @@ package br.ufg.artattack.servico;
 import br.ufg.artattack.config.AutenticacaoConfiguracoes;
 import br.ufg.artattack.modelo.Usuario;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
-import br.ufg.artattack.rest.dto.UsuarioDTO;
+import br.ufg.artattack.dto.UsuarioDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

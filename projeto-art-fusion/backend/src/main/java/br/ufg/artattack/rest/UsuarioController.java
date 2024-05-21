@@ -1,12 +1,10 @@
 package br.ufg.artattack.rest;
 
-import br.ufg.artattack.config.AutenticacaoConfiguracoes;
 import br.ufg.artattack.modelo.Usuario;
-import br.ufg.artattack.rest.dto.UsuarioDTO;
+import br.ufg.artattack.dto.UsuarioDTO;
 import br.ufg.artattack.servico.UsuarioServico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.rmi.ServerException;
