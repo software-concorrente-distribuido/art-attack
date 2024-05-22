@@ -1,5 +1,8 @@
 ## Trabalho Final da Disciplina de Software Concorrente e Distribuído!
 
+## Diagramas
+[CLIQUE AQUI](https://drive.google.com/file/d/1nSkpeHJiGiVqusFc7uL7A-Jva1d9B7br/view?usp=sharing)
+
 
 ### Rodar backend:
 
