@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 public class WebSocketAlteracoesController {
 
     @MessageMapping("/alteracao")
-    public String hadleSocket(String message) throws Exception {
+        public String hadleSocket(String message) throws Exception {
         Thread.sleep(1000); // simulated delay
         return "-->" + message + "<--" + " "+ System.currentTimeMillis();
     }
