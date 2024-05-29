@@ -1,4 +1,4 @@
-package br.ufg.artattack.rest.filtro;
+package br.ufg.artattack.config.filtro;
 import br.ufg.artattack.dto.UsuarioDTO;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

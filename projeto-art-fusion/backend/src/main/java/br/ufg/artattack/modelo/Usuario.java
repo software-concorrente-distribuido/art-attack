@@ -3,6 +3,7 @@ package br.ufg.artattack.modelo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,12 +22,11 @@ public class Usuario extends EntidadeJPA implements UserDetails {
 
     public String nome;
 
-    @Column(length = 11)
-    @Getter
-    private String cpf;
-
     @Column( nullable = false)
     private String senha;
+
+    @OneToMany(mappedBy = "usuario")
+    List<Arte> artes;
 
 
     @Override
@@ -63,11 +63,6 @@ public class Usuario extends EntidadeJPA implements UserDetails {
     public boolean isEnabled() {
         return this.isAtivo();
     }
-    public void setCpf(String cpf) {
-        cpf = cpf.replace(".","").replace("-","");
-        this.cpf = cpf;
-    }
-
 
 
     public void setSenha(String senha) {

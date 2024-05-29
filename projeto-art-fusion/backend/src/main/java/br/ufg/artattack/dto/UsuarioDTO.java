@@ -12,14 +12,12 @@ import java.util.List;
 @Getter
 public class UsuarioDTO {
     public String email;
-    public String cpf;
     public String id;
 
     public UsuarioDTO(){}
 
     public UsuarioDTO(Usuario usuario){
         this.email = usuario.email;
-        this.cpf = usuario.getCpf();
         this.id = usuario.getId().toString();
     }
 

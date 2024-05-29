@@ -41,6 +41,10 @@ public class UsuarioServico implements UserDetailsService {
         return (UsuarioDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
+    public Usuario getUsuarioLogadoDB(){
+        return usuarioRepositorio.findById(Long.valueOf(((UsuarioDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).id)).orElse(null);
+    }
+
     public Usuario criarUsuario(Usuario usuario) throws ServerException {
 
         Usuario maybeExist = this.usuarioRepositorio.findByEmail(usuario.getUsername());

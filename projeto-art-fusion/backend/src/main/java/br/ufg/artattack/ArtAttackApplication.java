@@ -20,7 +20,6 @@ public class ArtAttackApplication {
     public void gerarDados(){
         if(!usuarioRepositorio.findAll().isEmpty()) return;
         var cliente = new Usuario();
-        cliente.setCpf("061.085.541-77");
         cliente.nome = "João Gabriel Tavares";
         cliente.email = "joao@gmail.com";
         cliente.setSenha("$2a$12$xiQJXM2SGyP5r2FevTXGcevF.KU5G.GtdE/zzktHB.5ldWamg2M.m");//senha123
