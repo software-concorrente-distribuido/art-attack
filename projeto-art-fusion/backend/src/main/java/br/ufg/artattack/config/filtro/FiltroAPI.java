@@ -43,6 +43,12 @@ public class FiltroAPI extends OncePerRequestFilter {
 
             );
 
+        }else{
+            SecurityContextHolder.getContext().setAuthentication(
+
+                    new UsernamePasswordAuthenticationToken(null,null, List.of(new SimpleGrantedAuthority("ROLE_USER")))
+
+            );
         }
 
         filterChain.doFilter(request,response);

@@ -16,13 +16,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-public class AutenticacaoConfiguracoes {
+public class WebConfigurantions {
 
     @Autowired
     private FiltroAPI securityFilter;
@@ -34,7 +35,7 @@ public class AutenticacaoConfiguracoes {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .csrf(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(it->{
@@ -42,7 +43,7 @@ public class AutenticacaoConfiguracoes {
                     it.requestMatchers(HttpMethod.GET, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
                     if(ambiente.getMvc())
                         it.requestMatchers(HttpMethod.GET, "/**").permitAll();
-                    it.anyRequest().authenticated();
+
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -51,9 +52,11 @@ public class AutenticacaoConfiguracoes {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // Permitir todas as origens
+        configuration.addAllowedOriginPattern("http:\\/\\/localhost:[0-9]*");
+        configuration.addAllowedOrigin("http://localhost:3000"); // Permitir todas as origens
         configuration.addAllowedMethod("*"); // Permitir todos os métodos HTTP
         configuration.addAllowedHeader("*"); // Permitir todos os cabeçalhos
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

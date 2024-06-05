@@ -1,6 +1,6 @@
 package br.ufg.artattack.servico;
 
-import br.ufg.artattack.config.AutenticacaoConfiguracoes;
+import br.ufg.artattack.config.WebConfigurantions;
 import br.ufg.artattack.modelo.Usuario;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import br.ufg.artattack.dto.UsuarioDTO;
@@ -20,7 +20,7 @@ public class UsuarioServico implements UserDetailsService {
     public UsuarioRepositorio usuarioRepositorio;
 
     @Autowired
-    AutenticacaoConfiguracoes autenticacaoConfiguracoes;
+    WebConfigurantions autenticacaoConfiguracoes;
 
 
     public Usuario getUsuarioPeloEmail(String email){
