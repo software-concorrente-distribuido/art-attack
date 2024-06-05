@@ -40,10 +40,10 @@ public class WebConfigurantions {
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(it->{
                     it.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll();
-                    it.requestMatchers(HttpMethod.POST, "/api/usuario/criar").permitAll(); // nega todas as outras URLs que começam com /api
+                    it.requestMatchers(HttpMethod.POST, "/api/usuario/criar").permitAll();
 
-                    it.requestMatchers(HttpMethod.GET, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
-                    it.requestMatchers(HttpMethod.POST, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
+                    it.requestMatchers(HttpMethod.GET, "/api/**").authenticated();
+                    it.requestMatchers(HttpMethod.POST, "/api/**").authenticated();
 
                     if(ambiente.getMvc())
                         it.requestMatchers(HttpMethod.GET, "/**").permitAll();
