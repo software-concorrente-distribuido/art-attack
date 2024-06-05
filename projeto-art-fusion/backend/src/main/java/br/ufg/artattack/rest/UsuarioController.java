@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.rmi.ServerException;
+import java.util.LinkedList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuario")
@@ -17,13 +19,22 @@ public class UsuarioController {
     UsuarioServico usuarioServico;
 
 
+    @GetMapping("/listar")
+    public ResponseEntity<List<UsuarioDTO>> listar(){
+
+        LinkedList<UsuarioDTO> usuarioDTOs = new LinkedList<>(usuarioServico.usuarioRepositorio.findAll().stream().map(UsuarioDTO::new).toList());
+        return ResponseEntity.ok(usuarioDTOs);
+
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity conseguirUsuarioDTO(@PathVariable Long id){
     var cliente = usuarioServico.usuarioRepositorio.findById(id).orElse(new Usuario());
     return ResponseEntity.ok(new UsuarioDTO(cliente));
     }
 
-    @PostMapping
+    @PostMapping("/criar")
     public ResponseEntity createUser(@RequestBody Usuario usuario){
 
         Usuario usrDB = null;
@@ -34,10 +45,17 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+
     }
 
     @GetMapping("/isAlive")
     public ResponseEntity<UsuarioDTO> ping(){
+
+        return ResponseEntity.ok(usuarioServico.getUsuarioLogadoDTO());
+
+    }
+    @PostMapping("/isAlive")
+    public ResponseEntity<UsuarioDTO> pingPost(){
 
         return ResponseEntity.ok(usuarioServico.getUsuarioLogadoDTO());
 

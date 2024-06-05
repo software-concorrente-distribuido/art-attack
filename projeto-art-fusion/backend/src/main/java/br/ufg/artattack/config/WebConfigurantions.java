@@ -40,7 +40,11 @@ public class WebConfigurantions {
                 .sessionManagement(sess->sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(it->{
                     it.requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll();
+                    it.requestMatchers(HttpMethod.POST, "/api/usuario/criar").permitAll(); // nega todas as outras URLs que começam com /api
+
                     it.requestMatchers(HttpMethod.GET, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
+                    it.requestMatchers(HttpMethod.POST, "/api/**").authenticated(); // nega todas as outras URLs que começam com /api
+
                     if(ambiente.getMvc())
                         it.requestMatchers(HttpMethod.GET, "/**").permitAll();
 
@@ -53,8 +57,11 @@ public class WebConfigurantions {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOriginPattern("http:\\/\\/localhost:[0-9]*");
+        configuration.addAllowedOrigin("https://api.getpostman.com");
         configuration.addAllowedOrigin("http://localhost:3000"); // Permitir todas as origens
-        configuration.addAllowedMethod("*"); // Permitir todos os métodos HTTP
+        configuration.addAllowedMethod("GET"); // Permitir todos os métodos HTTP
+        configuration.addAllowedMethod("POST"); // Permitir todos os métodos HTTP
+
         configuration.addAllowedHeader("*"); // Permitir todos os cabeçalhos
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
