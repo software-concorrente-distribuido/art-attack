@@ -13,7 +13,7 @@ public class Arte extends EntidadeJPA implements Serializable {
 
     public String titulo;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario usuario;
 
     @Enumerated(EnumType.STRING)

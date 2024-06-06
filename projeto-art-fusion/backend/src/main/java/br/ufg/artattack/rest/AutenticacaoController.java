@@ -1,5 +1,6 @@
 package br.ufg.artattack.rest;
 
+import br.ufg.artattack.exception.ExcecaoDTO;
 import br.ufg.artattack.modelo.Usuario;
 import br.ufg.artattack.dto.LoginRequestDTO;
 import br.ufg.artattack.dto.UsuarioDTO;
@@ -32,12 +33,16 @@ public class AutenticacaoController {
     @PostMapping("/login")
     public ResponseEntity conseguirToken(@RequestBody @Valid LoginRequestDTO authDTO){
 
-        var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(),authDTO.getSenha()));
+        try{
+            var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authDTO.getEmail(),authDTO.getSenha()));
 
-        if(auth.getPrincipal() instanceof Usuario usuario)
-            return ResponseEntity.ok().body(jwtServico.gerarJWT(new UsuarioDTO(usuario)));
-        else
-            return ResponseEntity.internalServerError().build();
+            if(auth.getPrincipal() instanceof Usuario usuario)
+                return ResponseEntity.ok().body(jwtServico.gerarJWT(new UsuarioDTO(usuario)));
+            else
+                return ResponseEntity.internalServerError().build();
+        }catch (Exception e){
+            return ResponseEntity.internalServerError().body(new ExcecaoDTO(e));
+        }
     }
 
 

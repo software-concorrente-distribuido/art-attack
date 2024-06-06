@@ -1,12 +1,10 @@
 package br.ufg.artattack.rest;
 
-import br.ufg.artattack.dto.AlterarDTO;
 import br.ufg.artattack.dto.ArteDTO;
-import br.ufg.artattack.modelo.Alteracao;
 import br.ufg.artattack.modelo.Arte;
 import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.repositorio.ArteRepositorio;
-import br.ufg.artattack.servico.UsuarioServico;
+import br.ufg.artattack.servico.ArteServico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,16 +21,16 @@ public class ArteController {
     @Autowired
     ArteRepositorio arteRepositorio;
 
+
+
     @Autowired
-    UsuarioServico usuarioServico;
+    ArteServico arteServico;
 
 
     @PostMapping("/criar")
     public ResponseEntity criarArte(@RequestBody ArteDTO arteDTO){
-        Arte arte = new Arte();
-        arte.usuario =  usuarioServico.getUsuarioLogadoDB();
-        arteRepositorio.save(arte);
-        return ResponseEntity.ok(new ArteDTO(arte));
+
+        return ResponseEntity.ok(arteServico.criarArteDoUsuarioLogado(arteDTO));
     }
 
 
