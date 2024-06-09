@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ArteServico {
@@ -15,7 +16,7 @@ public class ArteServico {
     UsuarioServico usuarioServico;
 
     @Autowired
-    ArteRepositorio arteRepositorio;
+    public ArteRepositorio arteRepositorio;
 
     public ArteDTO criarArteDoUsuarioLogado(ArteDTO arteDTO){
         if(arteDTO.id!=null){
@@ -23,7 +24,6 @@ public class ArteServico {
         }
         Arte templateArte = new Arte();
         templateArte.usuario = usuarioServico.getUsuarioLogadoDB();
-        templateArte.ativo = true;
         templateArte.titulo = arteDTO.titulo;
         templateArte.dataCriacao = new Date();
         var arteDoBanco = arteRepositorio.save(templateArte);
@@ -36,4 +36,7 @@ public class ArteServico {
         return arteDTO;
     }
 
+    public List<ArteDTO> findAllDTOs() {
+        return arteRepositorio.findAll().stream().map(ArteDTO::new).toList();
+    }
 }

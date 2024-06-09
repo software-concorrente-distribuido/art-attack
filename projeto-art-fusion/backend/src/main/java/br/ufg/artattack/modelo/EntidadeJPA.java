@@ -19,8 +19,8 @@ public abstract class EntidadeJPA {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(name = "ativo")
-    public Boolean ativo;
+
+
 
     public Date dataCriacao;
 

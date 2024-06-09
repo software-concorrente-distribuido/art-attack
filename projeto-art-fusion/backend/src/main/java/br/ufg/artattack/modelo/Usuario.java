@@ -16,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Usuario extends EntidadeJPA implements UserDetails {
 
+    @Column(name = "ativo")
+    public Boolean ativo;
+
     @Column(nullable = false)
     public String email;
 

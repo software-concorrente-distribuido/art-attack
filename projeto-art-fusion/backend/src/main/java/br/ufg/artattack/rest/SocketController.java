@@ -1,27 +1,32 @@
 package br.ufg.artattack.rest;
 
-import br.ufg.artattack.modelo.Alteracao;
+import br.ufg.artattack.dto.AlteracaoDTO;
+import br.ufg.artattack.servico.AlteracaoServico;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
+
 @Controller
 public class SocketController {
 
+    @Autowired
+    AlteracaoServico alteracaoServico;
+
+
     @MessageMapping("/alteracoes")
-    public String handle(@Payload String alteracaoJson)  {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Alteracao alteracao;
+    public String propagar(@Payload String payload)  {
+        AlteracaoDTO alteracaoDTO;
         try {
-            alteracao =  objectMapper.readValue(alteracaoJson, Alteracao.class);
-        } catch (JsonProcessingException e) {
-            return "Mensagem de alteração inválida!";
+            alteracaoDTO = alteracaoServico.salvarPayloadAlteracao(payload);
+        } catch (Exception e) {
+            return "{}";
         }
 
-
-        return "Recebido!" ;
+        return alteracaoDTO.toJsonString();
 
     }
 
