@@ -1,11 +1,15 @@
 package br.ufg.artattack.config.filtro;
 import br.ufg.artattack.dto.UsuarioDTO;
+import br.ufg.artattack.exception.ExcecaoDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import br.ufg.artattack.servico.JWTServico;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,29 +33,37 @@ public class FiltroAPI extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = obterJWT(request);
+        try{
+            String authorization = obterJWT(request);
 
-        if(authorization!=null) {
+            if(authorization==null){
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(null,null, List.of(new SimpleGrantedAuthority("ROLE_USER")))
+                );
+                filterChain.doFilter(request,response);
+                return;
+            }
 
-            jwtServico.validarJWT(authorization);
 
-            UsuarioDTO usuarioDTO = jwtServico.obterUsuarioDTO(authorization);
+                jwtServico.validarJWT(authorization);
 
-            SecurityContextHolder.getContext().setAuthentication(
+                UsuarioDTO usuarioDTO = jwtServico.obterUsuarioDTO(authorization);
 
-                    new UsernamePasswordAuthenticationToken(usuarioDTO,null, List.of(new SimpleGrantedAuthority("ROLE_USUARIO_LOGADO")))
+                SecurityContextHolder.getContext().setAuthentication(
 
-            );
+                        new UsernamePasswordAuthenticationToken(usuarioDTO,null, List.of(new SimpleGrantedAuthority("ROLE_USUARIO_LOGADO")))
 
-        }else{
-            SecurityContextHolder.getContext().setAuthentication(
+                );
 
-                    new UsernamePasswordAuthenticationToken(null,null, List.of(new SimpleGrantedAuthority("ROLE_USER")))
 
-            );
+            filterChain.doFilter(request,response);
+
+        }catch (Exception e){
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setHeader("Content-type","application/json");
+            response.getWriter().write(convertObjectToJson(new ExcecaoDTO(e)));
         }
 
-        filterChain.doFilter(request,response);
     }
 
 
@@ -64,6 +76,14 @@ public class FiltroAPI extends OncePerRequestFilter {
 
         return null;
 
+    }
+
+    public String convertObjectToJson(Object object) throws JsonProcessingException {
+        if (object == null) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(object);
     }
 
 }

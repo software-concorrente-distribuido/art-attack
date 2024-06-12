@@ -4,7 +4,6 @@ package br.ufg.artattack.modelo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 public class Usuario extends EntidadeJPA implements UserDetails {
 
+    @Column(name = "ativo")
+    public Boolean ativo;
+
     @Column(nullable = false)
     public String email;
 
@@ -26,7 +28,7 @@ public class Usuario extends EntidadeJPA implements UserDetails {
     private String senha;
 
     @OneToMany(mappedBy = "usuario")
-    List<Arte> artes;
+    public List<Arte> artes;
 
 
     @Override
@@ -61,7 +63,7 @@ public class Usuario extends EntidadeJPA implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.isAtivo();
+        return this.ativo;
     }
 
 

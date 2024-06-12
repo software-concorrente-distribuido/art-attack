@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket with Spring</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.5/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script>
+        var stompClient = null;
+
+         function connect() {
+
+                    const accessToken =  document.querySelector("#token").value;
+                    console.log(accessToken);
+
+                    var socket = new SockJS('http://localhost:8080/artsocket');
+                    stompClient = Stomp.over(socket);
+                    stompClient.connect({"X-Authorization": "Bearer " + accessToken}, function (frame) {
+                        alert("Conectado!")
+                        stompClient.subscribe('/topic/alteracoes', function (message) {
+
+                            document.querySelector("#resposta-server").innerHTML =
+                                document.querySelector("#resposta-server").innerHTML + "<br/>" + message.body
+                        });
+                    });
+
+        }
+
+        function sendEvent(value){
+            if (stompClient != null) {
+                stompClient.send("/envio/alteracoes", {}, value);
+            }
+        }
+        function enviarEvento(){
+            let mensagem= document.querySelector("#input-evento").value;
+            console.log(mensagem)
+            sendEvent(mensagem)
+        }
+
+        function disconnect() {
+             alert("desconectado!")
+            if (stompClient !== null) {
+                stompClient.disconnect();
+                stompClient = null;
+            }
+            console.log("Desconectado!");
+        }
+    </script>
+</head>
+<body>
+    <div style="display: flex; width: 600px; justify-content: end">
+        <button onclick="connect()">Conectar</button>
+        <button onclick="enviarEvento()">Enviar evento</button>
+        <button onclick="disconnect()">Desconectar</button>
+    </div>
+    <div style="
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+">
+        <div style="margin-right: 20px; margin-bottom: 20px">
+            <label for="token">Token JWT</label>
+            <input id="token">
+        </div>
+        <div>
+            <label for="input-evento">Mensagem</label>
+            <textarea id="input-evento"></textarea>
+        </div>
+        <div style="text-align: center">
+            <h1>Broadcast do servidor!</h1>
+            <p id="resposta-server">*nada ainda*</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+

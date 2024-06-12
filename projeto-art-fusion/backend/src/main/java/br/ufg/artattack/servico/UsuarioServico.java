@@ -54,6 +54,7 @@ public class UsuarioServico implements UserDetailsService {
         }
         usuario.setSenha(autenticacaoConfiguracoes.passwordEncoder().encode(usuario.getPassword()));
 
+
         return this.usuarioRepositorio.save(usuario);
     }
 }

@@ -1,5 +1,6 @@
 package br.ufg.artattack.rest;
 
+import br.ufg.artattack.exception.ExcecaoDTO;
 import br.ufg.artattack.modelo.Usuario;
 import br.ufg.artattack.dto.UsuarioDTO;
 import br.ufg.artattack.servico.UsuarioServico;
@@ -23,14 +24,19 @@ public class UsuarioController {
     public ResponseEntity<List<UsuarioDTO>> listar(){
 
         LinkedList<UsuarioDTO> usuarioDTOs = new LinkedList<>(usuarioServico.usuarioRepositorio.findAll().stream().map(UsuarioDTO::new).toList());
-        return ResponseEntity.ok(usuarioDTOs);
 
+        return ResponseEntity.ok(usuarioDTOs);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity conseguirUsuarioDTO(@PathVariable Long id){
-    var cliente = usuarioServico.usuarioRepositorio.findById(id).orElse(new Usuario());
+    var cliente = usuarioServico.usuarioRepositorio.findById(id).orElse(null);
+
+    if(cliente==null){
+        throw new RuntimeException("Usuario não encontrado no banco!");
+    }
+
     return ResponseEntity.ok(new UsuarioDTO(cliente));
     }
 
@@ -42,7 +48,7 @@ public class UsuarioController {
             usrDB = usuarioServico.criarUsuario(usuario);
             return ResponseEntity.ok(new UsuarioDTO(usrDB));
         } catch (ServerException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ExcecaoDTO(e));
         }
 
 

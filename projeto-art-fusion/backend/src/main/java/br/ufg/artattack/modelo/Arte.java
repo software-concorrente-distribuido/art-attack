@@ -3,6 +3,7 @@ package br.ufg.artattack.modelo;
 import jakarta.persistence.*;
 import lombok.Getter;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -13,20 +14,22 @@ public class Arte extends EntidadeJPA implements Serializable {
 
     public String titulo;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     public Usuario usuario;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    public byte[] snapshot;
 
     @Enumerated(EnumType.STRING)
     public Visibilidade visibilidade;
-
-    @OneToMany(mappedBy = "arte", fetch = FetchType.LAZY)
-    public List<Alteracao> alteracoes;
 
 
     public Arte(){
         this.visibilidade = Visibilidade.PRIVADO;
         this.dataCriacao = new Date();
     }
+
 
     public Arte(Long id){
         this.setId( id);

@@ -23,7 +23,7 @@ public class ArtAttackApplication {
         cliente.nome = "João Gabriel Tavares";
         cliente.email = "joao@gmail.com";
         cliente.setSenha("$2a$12$xiQJXM2SGyP5r2FevTXGcevF.KU5G.GtdE/zzktHB.5ldWamg2M.m");//senha123
-        cliente.setAtivo(true);
+        cliente.ativo = true;
         usuarioRepositorio.save(cliente);
     }
 
