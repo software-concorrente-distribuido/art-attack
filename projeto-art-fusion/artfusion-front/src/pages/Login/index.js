@@ -15,13 +15,13 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email | !password) {
             setError('Preencha todos os campos');
             return;
         }
 
-        const res = login(email, password);
+        const res = await login(email, password);
 
         if (res) {
             setError(res);
