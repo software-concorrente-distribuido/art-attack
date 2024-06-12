@@ -1,6 +1,42 @@
 # Parte 2
 
 ## Questão 1.
+Uma arquitetura que fornece uma possível solução é a implementada no código. Ela vem
+da visão do problema como um problema clássico de Buffer Limitado, porém com o buffer
+com um só espaço, que é o da mensagem! A arquitetura funciona da seguinte forma:
+todos os consumidores tentam sempre consumir, se não conseguirem, esperam até
+receberem um sinal de algum produtor de que a mensagem está na caixa, então eles 
+tentam novamente fazer a operação de consumir, e assim recursivamente. Para o 
+produtor é o mesmo caso, sempre tentam produzir, se não conseguirem, esperam
+até que algum consumidor os sinalize que existe uma mensagem na caixa, nesse
+momento é repetida a operação. Porém, na implementação, quem realiza essa lógica
+é a própria MailBox, que controla os próprios acessos, fazendo quem quer consumir
+esperar na hora certa e quem quer produzir, produzir a mensagem na hora certa!
+```
+MailBox(){
+   String msg
+    storeMessage(mensagem){
+    if(msg==null){
+     msg = mensagem;
+     }
+    else{
+     wait();
+     this.storeMessage(mensagem);
+     }
+    }
+    retrieveMessage(){
+    if(msg!=null){
+     String msgRetornar = new String(msg);
+     msg = null;
+     return msgRetornar;
+    }else{
+    wait()
+    return this.retrieveMessage();
+    }
+    }
+}
+
+```
 
 ## Questão 2.
 
