@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import Header from '../../components/HeaderPaint';
 import Sidebar from '../../components/SidebarPaint';
 import * as C from './styles';
+import socketService from '../../services/socket';
+import Cookies from 'js-cookie';
 
 const Paint = () => {
     const mainCanvasRef = useRef(null);
@@ -13,6 +15,24 @@ const Paint = () => {
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [undoStack, setUndoStack] = useState([]);
     const [redoStack, setRedoStack] = useState([]);
+    const [socket, setSocket] = useState(null);
+    const [points, setPoints] = useState([]);
+
+    useEffect(() => {
+        const token = Cookies.get('user_token');
+        if (token) {
+            socketService.connect(() => {
+                console.log('Subscribing to /topic/alteracoes...');
+                socketService.subscribe('/topic/alteracoes', handleRemoteDrawing);
+            });
+        } else {
+            console.error('JWT token not found. Redirecting to login.');
+        }
+
+        return () => {
+            socketService.disconnect();
+        };
+    }, []);
 
     useEffect(() => {
         const mainCanvas = mainCanvasRef.current;
@@ -43,12 +63,19 @@ const Paint = () => {
         setIsDrawing(true);
         const { offsetX, offsetY } = e.nativeEvent;
         setStartPos({ x: offsetX, y: offsetY });
+        setPoints([{ x: offsetX, y: offsetY }]);
 
         if (tool === 'pencil' || tool === 'brush' || tool === 'eraser') {
             mainContext.beginPath();
             mainContext.moveTo(offsetX, offsetY);
         } else if (tool === 'bucket') {
             fill(mainContext, offsetX, offsetY, color);
+            const drawingData = {
+                arteId: 1,
+                usuarioId: 1,
+                delta: { tool, color, lineWidth, points: [{ x: offsetX, y: offsetY }] },
+            };
+            socketService.send('/envio/alteracoes', drawingData);
         }
     };
 
@@ -62,122 +89,151 @@ const Paint = () => {
 
         previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 
+        let newPoints = [];
         switch (tool) {
             case 'pencil':
             case 'brush':
                 mainContext.lineTo(offsetX, offsetY);
                 mainContext.stroke();
+                newPoints = points.concat([{ x: offsetX, y: offsetY }]);
+                setPoints(newPoints);
                 break;
             case 'eraser':
                 mainContext.strokeStyle = '#fff';
                 mainContext.lineTo(offsetX, offsetY);
                 mainContext.stroke();
+                newPoints = points.concat([{ x: offsetX, y: offsetY }]);
+                setPoints(newPoints);
                 break;
             case 'circle':
-                drawCircle(previewContext, startPos.x, startPos.y, offsetX, offsetY);
+                drawCircle(previewContext, startPos, { x: offsetX, y: offsetY });
                 break;
             case 'square':
-                drawRect(previewContext, startPos.x, startPos.y, offsetX, offsetY);
+                drawRect(previewContext, startPos, { x: offsetX, y: offsetY });
                 break;
             case 'triangle':
-                drawTriangle(previewContext, startPos.x, startPos.y, offsetX, offsetY);
+                drawTriangle(previewContext, startPos, { x: offsetX, y: offsetY });
                 break;
             case 'line':
-                drawLine(previewContext, startPos.x, startPos.y, offsetX, offsetY);
+                drawLine(previewContext, startPos, { x: offsetX, y: offsetY });
                 break;
             default:
                 break;
         }
+
+        // Enviar alterações para o servidor via WebSocket
+        const drawingData = {
+            arteId: 1,
+            usuarioId: 1,
+            delta: { tool, color, lineWidth, points: newPoints },
+        };
+        socketService.send('/envio/alteracoes', drawingData);
     };
 
     const handleMouseUp = (e) => {
+        setIsDrawing(false);
+
         const mainCanvas = mainCanvasRef.current;
         const previewCanvas = previewCanvasRef.current;
         const mainContext = mainCanvas.getContext('2d');
+        const previewContext = previewCanvas.getContext('2d');
         const { offsetX, offsetY } = e.nativeEvent;
 
-        if (!isDrawing) return;
+        previewContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 
-        previewCanvas.getContext('2d').clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-        switch (tool) {
-            case 'circle':
-                drawCircle(mainContext, startPos.x, startPos.y, offsetX, offsetY);
-                break;
-            case 'square':
-                drawRect(mainContext, startPos.x, startPos.y, offsetX, offsetY);
-                break;
-            case 'triangle':
-                drawTriangle(mainContext, startPos.x, startPos.y, offsetX, offsetY);
-                break;
-            case 'line':
-                drawLine(mainContext, startPos.x, startPos.y, offsetX, offsetY);
-                break;
-            default:
-                break;
+        if (['circle', 'square', 'triangle', 'line'].includes(tool)) {
+            const drawingData = {
+                arteId: 1,
+                usuarioId: 1,
+                delta: { tool, color, lineWidth, points: [...points, { x: offsetX, y: offsetY }] },
+            };
+            socketService.send('/envio/alteracoes', drawingData);
         }
 
-        setIsDrawing(false);
+        setPoints([]);
     };
 
-    const drawCircle = (context, x1, y1, x2, y2) => {
-        const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    const sendDrawingData = (drawingData) => {
+        const data = {
+            arteId: 1,
+            usuarioId: 1,
+            delta: drawingData
+        };
+        socketService.send("/envio/alteracoes", data);
+    };
+
+    const drawCircle = (context, start, end) => {
+        const radius = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
         context.beginPath();
-        context.arc(x1, y1, radius, 0, Math.PI * 2);
+        context.arc(start.x, start.y, radius, 0, Math.PI * 2);
         context.stroke();
     };
 
-    const drawRect = (context, x1, y1, x2, y2) => {
-        const width = x2 - x1;
-        const height = y2 - y1;
+    const drawRect = (context, start, end) => {
+        const width = end.x - start.x;
+        const height = end.y - start.y;
         context.beginPath();
-        context.rect(x1, y1, width, height);
+        context.rect(start.x, start.y, width, height);
         context.stroke();
     };
 
-    const drawTriangle = (context, x1, y1, x2, y2) => {
+    const drawTriangle = (context, start, end) => {
         context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.lineTo(x1 - (x2 - x1), y2);
+        context.moveTo(start.x, start.y);
+        context.lineTo(end.x, end.y);
+        context.lineTo(start.x - (end.x - start.x), end.y);
         context.closePath();
         context.stroke();
     };
 
-    const drawLine = (context, x1, y1, x2, y2) => {
+    const drawLine = (context, start, end) => {
         context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
+        context.moveTo(start.x, start.y);
+        context.lineTo(end.x, end.y);
         context.stroke();
     };
 
-    const fill = (context, x, y, fillColor) => {
-        const imageData = context.getImageData(0, 0, context.canvas.width, context.canvas.height);
+    const fill = (context, startX, startY, fillColor) => {
+        const canvasWidth = context.canvas.width;
+        const canvasHeight = context.canvas.height;
+        const imageData = context.getImageData(0, 0, canvasWidth, canvasHeight);
         const data = imageData.data;
-        const targetColor = getColorAtPixel(data, x, y);
+        const targetColor = getColorAtPixel(data, startX, startY);
         const fillColorRgb = hexToRgb(fillColor);
-
+    
         if (!targetColor || colorsMatch(targetColor, fillColorRgb)) {
             return;
         }
-
-        const stack = [{ x, y }];
-
-        while (stack.length) {
+    
+        const stack = [{ x: startX, y: startY }];
+        const visited = new Set();
+    
+        const floodFill = () => {
             const { x, y } = stack.pop();
+            const key = `${x},${y}`;
+    
+            if (visited.has(key)) {
+                if (stack.length > 0) {
+                    requestAnimationFrame(floodFill);
+                }
+                return;
+            }
+    
+            visited.add(key);
+    
             let currentY = y;
-
+    
             while (currentY >= 0 && colorsMatch(getColorAtPixel(data, x, currentY), targetColor)) {
                 currentY--;
             }
-
+    
             currentY++;
             let reachLeft = false;
             let reachRight = false;
-
-            while (currentY < context.canvas.height && colorsMatch(getColorAtPixel(data, x, currentY), targetColor)) {
+    
+            while (currentY < canvasHeight && colorsMatch(getColorAtPixel(data, x, currentY), targetColor)) {
                 colorPixel(data, x, currentY, fillColorRgb);
-
+    
                 if (x > 0) {
                     if (colorsMatch(getColorAtPixel(data, x - 1, currentY), targetColor)) {
                         if (!reachLeft) {
@@ -188,8 +244,8 @@ const Paint = () => {
                         reachLeft = false;
                     }
                 }
-
-                if (x < context.canvas.width - 1) {
+    
+                if (x < canvasWidth - 1) {
                     if (colorsMatch(getColorAtPixel(data, x + 1, currentY), targetColor)) {
                         if (!reachRight) {
                             stack.push({ x: x + 1, y: currentY });
@@ -199,19 +255,25 @@ const Paint = () => {
                         reachRight = false;
                     }
                 }
-
+    
                 currentY++;
             }
-        }
-
-        context.putImageData(imageData, 0, 0);
+    
+            if (stack.length > 0) {
+                requestAnimationFrame(floodFill);
+            } else {
+                context.putImageData(imageData, 0, 0);
+            }
+        };
+    
+        floodFill();
     };
-
+    
     const getColorAtPixel = (data, x, y) => {
         const index = (y * mainCanvasRef.current.width + x) * 4;
         return [data[index], data[index + 1], data[index + 2], data[index + 3]];
     };
-
+    
     const colorPixel = (data, x, y, color) => {
         const index = (y * mainCanvasRef.current.width + x) * 4;
         data[index] = color[0];
@@ -219,12 +281,12 @@ const Paint = () => {
         data[index + 2] = color[2];
         data[index + 3] = 255;
     };
-
+    
     const hexToRgb = (hex) => {
         const bigint = parseInt(hex.slice(1), 16);
         return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
     };
-
+    
     const colorsMatch = (a, b) => {
         return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
     };
@@ -273,6 +335,52 @@ const Paint = () => {
             context.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
             context.drawImage(image, 0, 0);
         };
+    };
+
+    const handleRemoteDrawing = (message) => {
+        const { tool, color, lineWidth, points } = message.delta;
+        const context = mainCanvasRef.current.getContext('2d');
+        context.strokeStyle = color;
+        context.lineWidth = lineWidth;
+
+        switch (tool) {
+            case 'pencil':
+            case 'brush':
+                context.beginPath();
+                context.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    context.lineTo(points[i].x, points[i].y);
+                }
+                context.stroke();
+                break;
+            case 'circle':
+                drawCircle(context, points[0], points[1]);
+                break;
+            case 'square':
+                drawRect(context, points[0], points[1]);
+                break;
+            case 'triangle':
+                drawTriangle(context, points[0], points[1]);
+                break;
+            case 'line':
+                drawLine(context, points[0], points[1]);
+                break;
+            case 'bucket':
+                fill(context, points[0].x, points[0].y, color);
+                break;
+            case 'eraser':
+                context.globalCompositeOperation = 'destination-out';
+                context.beginPath();
+                context.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    context.lineTo(points[i].x, points[i].y);
+                }
+                context.stroke();
+                context.globalCompositeOperation = 'source-over';
+                break;
+            default:
+                break;
+        }
     };
 
     return (
