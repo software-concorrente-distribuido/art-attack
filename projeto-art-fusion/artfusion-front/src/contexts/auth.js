@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
 
             console.log('response: ', response);
 
-            Cookies.set('user_token', token, { expires: 1, secure: true, sameSite: 'Strict' });
+            Cookies.set('user_token', token, { expires: 1, secure: false, sameSite: 'Strict' });
             setUser({ email });
         } catch (error) {
             console.error('Errooooooooooor:', error.response ? error.response.data : error.message);

@@ -17,20 +17,22 @@ export const SidebarContainer = styled.div`
 `;
 
 export const ToolButton = styled.button`
-    background: none;
+    background: white;
     border: none;
+    border-radius: 10px;
     color: white;
+    transition: 0.3s;
     font-size: 24px;
     cursor: pointer;
     margin: 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
 
     &:hover {
-        color: lightblue;
+        background: lightgray;
     }
 `;
 

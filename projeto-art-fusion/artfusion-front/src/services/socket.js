@@ -10,9 +10,10 @@ class SocketService {
 
     connect(callback) {
         const token = Cookies.get('user_token');
+
         if (token) {
-            const socket = new SockJS('http://localhost:8080/artsocket');
-            this.stompClient = Stomp.over(socket);
+            const socketUrl = new SockJS('http://192.168.6.51:8080/artsocket');
+            this.stompClient = Stomp.over(socketUrl);
 
             this.stompClient.connect({ 'X-Authorization': `Bearer ${token}` }, (frame) => {
                 console.log('Connected: ' + frame);
@@ -36,9 +37,10 @@ class SocketService {
         }
     }
 
-    send(event, data) {
+
+    sendElementUpdate(elementData) {
         if (this.stompClient && this.connected) {
-            this.stompClient.send(event, {}, JSON.stringify(data));
+            this.stompClient.send('/envio/alteracoes', {}, JSON.stringify(elementData));
         } else {
             console.error('Socket is not connected');
         }
@@ -59,4 +61,5 @@ class SocketService {
 }
 
 const socketService = new SocketService();
+
 export default socketService;
