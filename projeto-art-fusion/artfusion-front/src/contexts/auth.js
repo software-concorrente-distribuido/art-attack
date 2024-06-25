@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            console.log('API URL:', process.env.REACT_APP_ARTFUSION_API_URL);
             const loginData = { email, senha: password };
 
             const response = await api.post('/auth/login', loginData);
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, name, password) => {
         try {
+            console.log("API URL:", process.env.REACT_APP_ARTFUSION_API_URL);
             const response = await api.post('/usuario/criar', { email, nome: name, senha: password, isAtive : true });
             console.log('response: ', response);
         } catch (error) {

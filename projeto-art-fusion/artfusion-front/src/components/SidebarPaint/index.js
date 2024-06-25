@@ -1,61 +1,101 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaArrowsAltH } from "react-icons/fa";
 import squareIcon from '../../assets/icons/square.svg';
 import lineIcon from '../../assets/icons/line.svg';
 import pencilIcon from '../../assets/icons/pencil.svg';
 import brushIcon from '../../assets/icons/brush.svg';
-import colorSelectorIcon from '../../assets/icons/color-selector.svg';
+import paletteIcon from '../../assets/icons/palette.svg';
 import eraserIcon from '../../assets/icons/eraser.svg';
 import lineThicknessIcon from '../../assets/icons/line-thickness.svg';
 import triangleIcon from '../../assets/icons/triangle.svg';
+import sprayIcon from '../../assets/icons/spray.svg';
 import circleIcon from '../../assets/icons/circle.svg';
 import { SketchPicker } from 'react-color';
-import { toolTypes } from '../../constants'; 
+import { toolTypes } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import * as S from './styles';
 import './styles.css';
-import { setToolType, setLineWidth } from '../whiteboard/whiteboardSlice';
+import {
+    setToolType,
+    setLineWidth,
+    setColor,
+} from '../whiteboard/whiteboardSlice';
 
 const lineWidths = [1, 2, 3, 4, 5, 10, 20];
 
-const IconButton = ({ src, type }) => {
+const colors = [
+    '#ff0000',
+    '#00ff00',
+    '#0000ff',
+    '#ffff00',
+    '#ff00ff',
+    '#00ffff',
+    '#000000',
+    '#ffffff',
+];
 
+const ToolButton = ({ src, type }) => {
     const dispatch = useDispatch();
 
-    const selectedToolType = useSelector(state => state.whiteboard.tool);
+    const selectedToolType = useSelector((state) => state.whiteboard.tool);
 
-    const handleToolChange =() => {
-        dispatch(setToolType(type))
+    const handleToolChange = () => {
+        dispatch(setToolType(type));
     };
 
-    const className = selectedToolType === type ? 'botao_sidebar_active' : 'botao_sidebar';
+    const className =
+        selectedToolType === type ? 'botao_sidebar_active' : 'botao_sidebar';
 
-    return <button className={className} onClick={handleToolChange}>
-        <img width='70%'src={src} />
-    </button>
-}
+    return (
+        <button className={className} onClick={handleToolChange}>
+            <img width="80%" src={src} />
+        </button>
+    );
+};
 
-const Sidebar = ({ onColorChange}) => {
+const IconButton = ({ src, onClick }) => {
+    return (
+        <button className={'botao_sidebar'} onClick={onClick}>
+            <img width="80%" src={src} />
+        </button>
+    );
+};
+
+const ColorPickerButton = ({ src, onClick, color }) => {
+    const buttonStyle = {
+        backgroundColor: color || '#FFFFFF',
+    };
+
+    return (
+        <button
+            className={'botao_color_picker'}
+            onClick={onClick}
+            style={buttonStyle}
+        >
+            <img width="80%" src={src} />
+        </button>
+    );
+};
+
+const Sidebar = () => {
     const [showLineWidths, setShowLineWidths] = useState(false);
-    //const [showColorPicker, setShowColorPicker] = useState(false);
-    // const [selectedColor, setSelectedColor] = useState('#000000');
+    const [showColorPicker, setShowColorPicker] = useState(false);
     const popupRef = useRef(null);
-    // const colorPickerRef = useRef(null);
+    const colorPickerRef = useRef(null);
+    const dispatch = useDispatch();
+    const lineWidth = useSelector((state) => state.whiteboard.lineWidth); // Obtendo a espessura da linha do estado
+    const color = useSelector((state) => state.whiteboard.color);
 
     useEffect(() => {
         // Adicionar listener para cliques fora do popup
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
             // Limpar listener
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
-    const dispatch = useDispatch();
-    const lineWidth = useSelector(state => state.whiteboard.lineWidth); // Obtendo a espessura da linha do estado
-
-    const handleLineWidthChange = (width) => {
-        dispatch(setLineWidth(width));
+    const handleLineWidthChange = (lineWidth) => {
+        dispatch(setLineWidth(lineWidth));
         setShowLineWidths(false); // Esconder o popup após a seleção
     };
 
@@ -67,48 +107,69 @@ const Sidebar = ({ onColorChange}) => {
         if (popupRef.current && !popupRef.current.contains(event.target)) {
             setShowLineWidths(false);
         }
+
+        if (
+            colorPickerRef.current &&
+            !colorPickerRef.current.contains(event.target)
+        ) {
+            setShowColorPicker(false);
+        }
     };
 
-    // const handleClickOutside = (event) => {
-    //     if (popupRef.current && !popupRef.current.contains(event.target)) {
-    //         setShowLineWidths(false);
-    //     }
-    //     // if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
-    //     //     setShowColorPicker(false);
-    //     // }
-    // };
+    const handleColorChange = (color) => {
+        dispatch(setColor(color.hex));
+    };
 
-    // const handleColorChange = (color) => {
-    //     setSelectedColor(color.hex);
-    //     onColorChange(color.hex);
-    // };
-
-    // const handlePaletteClick = () => {
-    //     setShowColorPicker(!showColorPicker);
-    // };
-
-    // useEffect(() => {
-    //     document.addEventListener('mousedown', handleClickOutside);
-    //     return () => {
-    //         document.removeEventListener('mousedown', handleClickOutside);
-    //     };
-    // }, []);
+    const handlePaletteClick = () => {
+        setShowColorPicker(!showColorPicker);
+    };
 
     return (
         <S.SidebarContainer>
-            <IconButton src={pencilIcon} type={toolTypes.PENCIL}  />
-            <IconButton src={eraserIcon} type={toolTypes.ERASER}  />
-            <IconButton src={circleIcon} type={toolTypes.CIRCLE}  />
-            <IconButton src={squareIcon} type={toolTypes.SQUARE}  />
-            <IconButton src={triangleIcon} type={toolTypes.TRIANGLE}  />
-            <IconButton src={lineIcon} type={toolTypes.LINE}  />
-            
-            <S.ToolButton title="Espessura" onClick={handleLineWidthClick}>
-                <FaArrowsAltH />
-            </S.ToolButton>
+            <ToolButton src={brushIcon} type={toolTypes.PENCIL} />
+            {/*<ToolButton src={sprayIcon} type={toolTypes.SPRAY} />*/}
+            <ToolButton src={eraserIcon} type={toolTypes.ERASER} />
+            {/* <ToolButton src={circleIcon} type={toolTypes.CIRCLE} /> */}
+            <ToolButton src={squareIcon} type={toolTypes.SQUARE} />
+            {/* <ToolButton src={triangleIcon} type={toolTypes.TRIANGLE} /> */}
+            <ToolButton src={lineIcon} type={toolTypes.LINE} />
+
+            <IconButton
+                src={lineThicknessIcon}
+                onClick={handleLineWidthClick}
+            />
 
             <S.Divider />
-             {showLineWidths && (
+
+            <S.SelectedColorIndicator>
+                <ColorPickerButton
+                    src={paletteIcon}
+                    onClick={handlePaletteClick}
+                    color={color}
+                />
+
+                {showColorPicker && (
+                    <S.ColorPickerPopup ref={colorPickerRef}>
+                        <SketchPicker
+                            color={color}
+                            onChange={handleColorChange}
+                        />
+                    </S.ColorPickerPopup>
+                )}
+            </S.SelectedColorIndicator>
+
+            <S.ColorBoxContainer>
+                {colors.map((color) => (
+                    <S.ColorBox
+                        key={color}
+                        color={color}
+                        title={`Cor ${color}`}
+                        onClick={() => handleColorChange({ hex: color })}
+                    />
+                ))}
+            </S.ColorBoxContainer>
+
+            {showLineWidths && (
                 <S.LineWidthPopup ref={popupRef}>
                     {lineWidths.map((width) => (
                         <S.LineWidthContainer
@@ -121,32 +182,7 @@ const Sidebar = ({ onColorChange}) => {
                     ))}
                 </S.LineWidthPopup>
             )}
-            
         </S.SidebarContainer>
-
-        //     <S.SelectedColorIndicator>
-        //         <S.SelectedColor color={selectedColor} />
-        //         <S.ToolButton title="Escolher cor" onClick={handlePaletteClick}>
-        //             <FaPalette />
-        //         </S.ToolButton>
-        //         {showColorPicker && (
-        //             <S.ColorPickerPopup ref={colorPickerRef}>
-        //                 <SketchPicker color={selectedColor} onChange={handleColorChange} />
-        //             </S.ColorPickerPopup>
-        //         )}
-        //     </S.SelectedColorIndicator>
-        //     <S.Divider />
-        //     <S.ColorBoxContainer>
-        //         {colors.map((color) => (
-        //             <S.ColorBox
-        //                 key={color}
-        //                 color={color}
-        //                 title={`Cor ${color}`}
-        //                 onClick={() => handleColorChange({ hex: color })}
-        //             />
-        //         ))}
-        //     </S.ColorBoxContainer>
-        
     );
 };
 
