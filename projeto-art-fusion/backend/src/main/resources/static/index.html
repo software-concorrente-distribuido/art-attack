@@ -6,6 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script>
         var stompClient = null;
+        let salaUUID = "";
 
          function connect() {
 
@@ -14,20 +15,42 @@
 
                     var socket = new SockJS('http://localhost:8080/artsocket');
                     stompClient = Stomp.over(socket);
-                    stompClient.connect({"X-Authorization": "Bearer " + accessToken}, function (frame) {
+                    stompClient.connect({"X-Authorization": "Bearer " + accessToken}, async function (frame) {
                         alert("Conectado!")
-                        stompClient.subscribe('/topic/alteracoes', function (message) {
 
-                            document.querySelector("#resposta-server").innerHTML =
-                                document.querySelector("#resposta-server").innerHTML + "<br/>" + message.body
+                        //1 - ABRIR SALA!
+                        let fetchWrapper = await fetch("http://localhost:8080/api/sala/abrir",{
+                            method:"POST",
+                            body : `
+                            {  "arteId": 352 }`,
+                            headers : {
+                                "Authorization" : "Bearer "+accessToken,
+                                "Content-Type": "application/json"
+                            }
+                        });
+
+                        //1 - ou CONSEGUIR SALA POR ID DA ARTE
+                        /*
+                        fetch(".../api/sala/obterPorArte/{arteId}")
+                         */
+
+                        fetchWrapper = await fetchWrapper.json();
+
+                        // sete o UUID da sala em algum lugar!
+                        salaUUID = fetchWrapper.uuid;
+
+                        alert("Se inscrevendo em: "+'/topic/alteracoes/'+salaUUID)
+
+                        stompClient.subscribe(`/topic/alteracoes/${salaUUID}`, function (message) {
+
+                            document.querySelector("#resposta-server").innerHTML = document.querySelector("#resposta-server").innerHTML + "<br/>" + message.body
                         });
                     });
-
         }
 
         function sendEvent(value){
             if (stompClient != null) {
-                stompClient.send("/envio/alteracoes", {}, value);
+                stompClient.send( `/envio/alteracoes/${salaUUID}`, {}, value);
             }
         }
         function enviarEvento(){

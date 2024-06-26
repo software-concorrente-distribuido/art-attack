@@ -27,7 +27,7 @@ public class ArteDTO {
         this.id = arte.getId();
         this.dataCriacao = arte.dataCriacao;
         this.titulo = arte.titulo;
-        var user = arte.getUsuario();
+        var user = arte.usuario;
         if(user!=null){
             this.usuarioId = user.getId();
             this.usuarioNome =user.getUsername();

@@ -1,19 +1,17 @@
 package br.ufg.artattack.servico;
 
-import br.ufg.artattack.dto.AlteracaoDTO;
+import br.ufg.artattack.dto.AlteracaoEntradaDTO;
+import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.modelo.Alteracao;
-import br.ufg.artattack.modelo.Arte;
 import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.repositorio.ArteRepositorio;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
 
 @Service
@@ -25,33 +23,39 @@ public class AlteracaoServico {
 
     UsuarioRepositorio usuarioRepositorio;
 
-    public AlteracaoServico(AlteracaoRepositorio alteracaoRepositorio,ArteRepositorio arteRepositorio,UsuarioRepositorio usuarioRepositorio ){
+    UsuarioServico usuarioServico;
+
+    public AlteracaoServico(AlteracaoRepositorio alteracaoRepositorio,
+                            ArteRepositorio arteRepositorio,
+                            UsuarioRepositorio usuarioRepositorio,
+                            UsuarioServico usuarioServico){
         this.alteracaoRepositorio = alteracaoRepositorio;
         this.arteRepositorio = arteRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
+        this.usuarioServico = usuarioServico;
     }
 
-    public AlteracaoDTO salvarPayloadAlteracao(String payload) throws JsonProcessingException, DataIntegrityViolationException {
+    public AlteracaoSaidaDTO salvarPayloadAlteracao(AlteracaoEntradaDTO payload) throws JsonProcessingException, DataIntegrityViolationException {
 
-        var dto = new ObjectMapper().readValue(payload,AlteracaoDTO.class);
+        AlteracaoSaidaDTO dto = new AlteracaoSaidaDTO(payload);
+
+        Long idUsuarioLogado = Long.valueOf(usuarioServico.getUsuarioLogadoDTO().id);
 
         var alteracao  = new Alteracao();
 
         alteracao.setDelta(dto.delta);
 
         alteracao.arte = arteRepositorio.getReferenceById(dto.arteId);
-        alteracao.usuario = usuarioRepositorio.getReferenceById(dto.usuarioId);
 
+        alteracao.usuario = usuarioRepositorio.getReferenceById(idUsuarioLogado);
 
-        try {
-            alteracao.dataCriacao = DateFormat.getDateInstance().parse(dto.dataCriacao);
-        } catch (Exception e) {
-            alteracao.dataCriacao = new Date();
-            dto.dataCriacao = alteracao.dataCriacao.toString();
-        }
-
+        alteracao.dataCriacao = new Date();
 
         alteracao = alteracaoRepositorio.save(alteracao);
+
+        dto.dataCriacao = alteracao.dataCriacao.getTime();
+
+        dto.usuarioId = idUsuarioLogado;
 
         dto.id = alteracao.getId();
 

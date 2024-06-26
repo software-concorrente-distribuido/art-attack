@@ -16,11 +16,10 @@ public class Alteracao extends EntidadeJPA {
 
     @Column(columnDefinition = "jsonb")
     @ColumnTransformer(write = "?::jsonb")
-    private String  delta;
+    private String delta;
 
     @ManyToOne()
     public Arte arte;
-
 
     @ManyToOne
     public Usuario usuario;
@@ -45,4 +44,5 @@ public class Alteracao extends EntidadeJPA {
 
         this.delta = new ObjectMapper().writeValueAsString(delta);
     }
+
 }

@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity(name="arte")
-@Getter
 public class Arte extends EntidadeJPA implements Serializable {
 
     public String titulo;
