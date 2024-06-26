@@ -9,6 +9,7 @@ import logo from '../../assets/images/logo.png';
 
 const Register = () => {
     const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [error, setError] = useState('');
@@ -16,8 +17,8 @@ const Register = () => {
 
     const { register } = useAuth();
 
-    const handleRegister = () => {
-        if (!email | !password | !passwordConfirmation) {
+    const handleRegister = async () => {
+        if (!email | !name | !password | !passwordConfirmation) {
             setError('Preencha todos os campos');
             return;
         } else if (password !== passwordConfirmation) {
@@ -25,7 +26,7 @@ const Register = () => {
             return;
         }
 
-        const res = register(email, password);
+        const res = await register(email, name, password);
 
         if (res) {
             setError(res);
@@ -48,6 +49,11 @@ const Register = () => {
             <C.Label style={{ paddingBottom : '10px' }}>
                 Informe os dados para cadastrar.
             </C.Label>
+            <Input
+                    placeholder="Nome"
+                    value={name}
+                    onChange={(e) => [setName(e.target.value), setError('')]}
+                />
                 <Input
                     type="email"
                     placeholder="E-mail"

@@ -1,4 +1,7 @@
 import { createContext, useEffect, useState } from 'react';
+import api from '../api';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext({});
 
@@ -6,69 +9,51 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState();
 
     useEffect(() => {
-        const userToken = localStorage.getItem('user_token');
-        const usersStorage = localStorage.getItem('users_bd');
+        const token = Cookies.get('user_token');
 
-        if (userToken && usersStorage) {
-            const hasUser = JSON.parse(usersStorage)?.filter(
-                (user) => user.email === JSON.parse(userToken).email
-              );
-        
-              if (hasUser) setUser(hasUser[0]);
+        if (token) {
+            const decodedToken = jwtDecode(token);
+            
+            
+            const { sub: email } = jwtDecode(token);
+            setUser({ email });
         }
     }, []);
 
-    const login = (email, password) => {
-        const usersStorage = JSON.parse(localStorage.getItem('users_bd'));
+    const login = async (email, password) => {
+        try {
+            console.log('API URL:', process.env.REACT_APP_ARTFUSION_API_URL);
+            const loginData = { email, senha: password };
 
-        const hasUser = usersStorage?.filter((user) => user.email === email);
+            const response = await api.post('/auth/login', loginData);
+            const token  = response.data;
 
-        if (hasUser?.length) {
-            if (
-                hasUser[0].email === email &&
-                hasUser[0].password === password
-            ) {
-                const token = Math.random().toString(36).substring(2);
-                localStorage.setItem(
-                    'user_token',
-                    JSON.stringify({ email, token })
-                );
-                setUser({ email, password });
-                return;
-            } else {
-                return 'E-mail ou senha incorretos';
-            }
-        } else {
-            return 'Usuário não cadastrado';
+            console.log('response: ', response);
+
+            Cookies.set('user_token', token, { expires: 1, secure: false, sameSite: 'Strict' });
+            setUser({ email });
+        } catch (error) {
+            console.error('Errooooooooooor:', error.response ? error.response.data : error.message);
+            return 'E-mail ou senha incorretos';
         }
     };
 
-    const register = (email, password) => {
-        const usersStorage = JSON.parse(localStorage.getItem('users_bd'));
-
-        const hasUser = usersStorage?.filter((user) => user.email === email);
-
-        if (hasUser?.length) {
-            return 'Já tem uma conta com esse E-mail';
+    const register = async (email, name, password) => {
+        try {
+            console.log("API URL:", process.env.REACT_APP_ARTFUSION_API_URL);
+            const response = await api.post('/usuario/criar', { email, nome: name, senha: password, isAtive : true });
+            console.log('response: ', response);
+        } catch (error) {
+            console.error('Errooooooooooor:', error.response ? error.response.data : error.message);
+            return 'Erro ao registrar usuário. ' + error.response ? error.response.data : error.message;
         }
-
-        let newUser;
-
-        if (usersStorage) {
-            newUser = [...usersStorage, { email, password }];
-        } else {
-            newUser = [{ email, password }];
-        }
-
-        localStorage.setItem('users_bd', JSON.stringify(newUser));
-
-        return;
     };
 
     const signout = () => {
         setUser(null);
-        localStorage.removeItem('user_token');
+        Cookies.remove('user_token');
     };
+    
     return (
         <AuthContext.Provider
             value={{ user, signed: !!user, login, register, signout }}

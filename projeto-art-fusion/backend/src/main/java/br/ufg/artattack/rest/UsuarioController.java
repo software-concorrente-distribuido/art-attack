@@ -42,7 +42,7 @@ public class UsuarioController {
 
     @PostMapping("/criar")
     public ResponseEntity createUser(@RequestBody Usuario usuario){
-
+        System.out.println("************************* Chamando");
         Usuario usrDB = null;
         try {
             usrDB = usuarioServico.criarUsuario(usuario);

@@ -1,0 +1,50 @@
+.botao_sidebar {
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    color: white;
+    
+    font-size: 24px;
+    cursor: pointer;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.botao_color_picker {
+    background: white;
+    border: 2px solid gray;
+    border-radius: 20px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.botao_sidebar:hover{
+    background: #5d6368;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.botao_sidebar_active {
+    background: ff7f50;
+    border: 3px solid #ff4500;
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    font-size: 24px;
+    cursor: pointer;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
