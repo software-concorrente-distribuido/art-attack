@@ -12,4 +12,8 @@ public class ExcecaoDTO {
         this.mensagem = e.getMessage();
         this.causa = e.getCause()!=null? e.getCause().toString() : e.getClass().getSimpleName();
     }
+    public ExcecaoDTO(String mensagem, String causa){
+        this.mensagem = mensagem;
+        this.causa = causa;
+    }
 }

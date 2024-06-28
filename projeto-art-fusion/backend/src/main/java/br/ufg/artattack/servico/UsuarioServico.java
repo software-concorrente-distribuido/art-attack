@@ -34,8 +34,8 @@ public class UsuarioServico implements UserDetailsService {
     }
 
     /**
-     * Não é possível pegar o usuário logado da classe Usuario, visto que é pego do JWT do contexto.
-     * @return objeto DTO do usuário logado
+     *
+     * @return UsuarioDTO contido no JWT
      */
     public UsuarioDTO getUsuarioLogadoDTO(){
         return (UsuarioDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
