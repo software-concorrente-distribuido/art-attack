@@ -25,9 +25,7 @@ No contexto do servidor FTP implementado, uma "thread trabalhadora" é uma threa
   A conexão de dados é estabelecida apenas quando necessária e é fechada após a conclusão da transferência, sendo este processo também gerenciado isoladamente pela thread trabalhadora.
 
 
-## Comandos implementados
-
-Comandos Suportados
+## Comandos suportados
 
 Abaixo estão os comandos FTP suportados pelo servidor, junto com suas descrições e parâmetros:
 
