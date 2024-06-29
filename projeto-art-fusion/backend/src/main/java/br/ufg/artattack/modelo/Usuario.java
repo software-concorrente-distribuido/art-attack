@@ -27,7 +27,7 @@ public class Usuario extends EntidadeJPA implements UserDetails {
     @Column( nullable = false)
     private String senha;
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "administrador")
     public List<Arte> artes;
 
 

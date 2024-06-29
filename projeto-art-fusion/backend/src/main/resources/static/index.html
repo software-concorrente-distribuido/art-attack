@@ -16,13 +16,13 @@
                     var socket = new SockJS('http://localhost:8080/artsocket');
                     stompClient = Stomp.over(socket);
                     stompClient.connect({"X-Authorization": "Bearer " + accessToken}, async function (frame) {
-                        alert("Conectado!")
+
 
                         //1 - ABRIR SALA!
                         let fetchWrapper = await fetch("http://localhost:8080/api/sala/abrir",{
                             method:"POST",
                             body : `
-                            {  "arteId": 352 }`,
+                            {  "arteId": 802 }`,
                             headers : {
                                 "Authorization" : "Bearer "+accessToken,
                                 "Content-Type": "application/json"
@@ -38,6 +38,11 @@
 
                         // sete o UUID da sala em algum lugar!
                         salaUUID = fetchWrapper.uuid;
+
+                        if(fetchWrapper["erro"]){
+                            alert(fetchWrapper["mensagem"])
+                            throw new Error("Erro!")
+                        }
 
                         alert("Se inscrevendo em: "+'/topic/alteracoes/'+salaUUID)
 

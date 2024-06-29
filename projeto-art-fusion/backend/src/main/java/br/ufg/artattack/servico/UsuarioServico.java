@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.rmi.ServerException;
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class UsuarioServico implements UserDetailsService {
@@ -30,7 +32,13 @@ public class UsuarioServico implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuarioRepositorio.findByEmail(username);
+
+        UserDetails userDetails = usuarioRepositorio.findByEmail(username);
+        if(userDetails == null){
+            throw new UsernameNotFoundException("Usuário ou senha inválida");
+        }
+
+        return userDetails;
     }
 
     /**
@@ -45,6 +53,10 @@ public class UsuarioServico implements UserDetailsService {
         return usuarioRepositorio.findById(Long.valueOf(((UsuarioDTO) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).id)).orElse(null);
     }
 
+    public Long getUsuarioLogadoId(){
+        return Long.valueOf(getUsuarioLogadoDTO().getId());
+    }
+
     public Usuario criarUsuario(Usuario usuario) throws ServerException {
 
         Usuario maybeExist = this.usuarioRepositorio.findByEmail(usuario.getUsername());
@@ -52,9 +64,19 @@ public class UsuarioServico implements UserDetailsService {
         if(maybeExist!=null){
             throw new ServerException("Email já utilizado!");
         }
+        usuario.ativo = true;
         usuario.setSenha(autenticacaoConfiguracoes.passwordEncoder().encode(usuario.getPassword()));
-
+        usuario.dataCriacao = new Date();
 
         return this.usuarioRepositorio.save(usuario);
     }
+
+    public Usuario getReferenceById(Long id){
+        return usuarioRepositorio.getReferenceById(id);
+    }
+
+    public Optional<Usuario> findById(Long id){
+        return usuarioRepositorio.findById(id);
+    }
+
 }

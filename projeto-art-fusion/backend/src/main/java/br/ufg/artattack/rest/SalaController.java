@@ -2,15 +2,12 @@ package br.ufg.artattack.rest;
 
 import br.ufg.artattack.dto.AbrirSalaDTO;
 import br.ufg.artattack.modelo.Sala;
+import br.ufg.artattack.servico.ArteServico;
 import br.ufg.artattack.servico.SalaServico;
-import br.ufg.artattack.util.RandomWordGenerator;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 @RestController()
 @RequestMapping("api/sala")
@@ -18,12 +15,16 @@ public class SalaController {
 
 
     @Autowired
+    ArteServico arteServico;
+
+    @Autowired
     SalaServico salaServico;
+
 
     @PostMapping("/abrir")
     public ResponseEntity<Sala> abrirSala(@RequestBody AbrirSalaDTO abrirSalaDTO) throws Exception {
 
-        Sala sala = salaServico.criarSala(abrirSalaDTO.arteId);
+        Sala sala = salaServico.abrirSala(abrirSalaDTO.arteId);
 
         return ResponseEntity.ok(sala);
     }

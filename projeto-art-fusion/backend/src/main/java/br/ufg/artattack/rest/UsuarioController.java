@@ -30,7 +30,7 @@ public class UsuarioController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity conseguirUsuarioDTO(@PathVariable Long id){
+    public ResponseEntity<UsuarioDTO> conseguirUsuarioDTO(@PathVariable Long id){
     var cliente = usuarioServico.usuarioRepositorio.findById(id).orElse(null);
 
     if(cliente==null){
@@ -42,7 +42,6 @@ public class UsuarioController {
 
     @PostMapping("/criar")
     public ResponseEntity createUser(@RequestBody Usuario usuario){
-        System.out.println("************************* Chamando");
         Usuario usrDB = null;
         try {
             usrDB = usuarioServico.criarUsuario(usuario);
@@ -53,6 +52,9 @@ public class UsuarioController {
 
 
     }
+
+
+
 
     @GetMapping("/isAlive")
     public ResponseEntity<UsuarioDTO> ping(){

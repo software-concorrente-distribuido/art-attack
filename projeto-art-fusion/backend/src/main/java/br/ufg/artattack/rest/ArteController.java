@@ -1,6 +1,8 @@
 package br.ufg.artattack.rest;
 
 import br.ufg.artattack.dto.ArteDTO;
+import br.ufg.artattack.dto.CompartilhamentoEntradaDTO;
+import br.ufg.artattack.dto.CompartilhamentoSaidaDTO;
 import br.ufg.artattack.modelo.Alteracao;
 import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.servico.ArteServico;
@@ -24,7 +26,20 @@ public class ArteController {
     @PostMapping("/criar")
     public ResponseEntity<ArteDTO> criarArte(@RequestBody ArteDTO arteDTO){
 
-        return ResponseEntity.ok(arteServico.criarArteDoUsuarioLogado(arteDTO));
+        ArteDTO art = arteServico.criarArteDoUsuarioLogado(arteDTO);
+
+        return ResponseEntity.ok(art);
+    }
+
+    @PostMapping("/compartilhar")
+    public ResponseEntity<List<CompartilhamentoSaidaDTO>> compartilharArte(@RequestBody CompartilhamentoEntradaDTO compartilhamentoEntradaDTO) throws Exception {
+        return ResponseEntity.ok(arteServico.compartilharParaAlguem(compartilhamentoEntradaDTO));
+    }
+
+    @GetMapping("/compartilhadasPorUsuario/{usuarioId}")
+    public ResponseEntity compartilhadasAMim(@PathVariable Long usuarioId){
+
+        return ResponseEntity.ok(arteServico.obterCompartilhadasPorUsuario(usuarioId));
     }
 
 

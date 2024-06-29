@@ -1,15 +1,15 @@
 package br.ufg.artattack.servico;
 
+import br.ufg.artattack.dto.AbrirSalaDTO;
 import br.ufg.artattack.modelo.Arte;
 import br.ufg.artattack.modelo.Sala;
+import br.ufg.artattack.modelo.TipoPermissao;
+import br.ufg.artattack.repositorio.CompartilhamentoRepositorio;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 
 @Service
 public class SalaServico {
@@ -17,15 +17,47 @@ public class SalaServico {
         private static Map<String, Sala> salas = new HashMap<>();
 
         @Autowired
+        UsuarioServico usuarioServico;
+
+        @Autowired
         ArteServico arteServico;
 
-        public Sala criarSala(Long idArte) throws Exception {
+        @Autowired
+        CompartilhamentoRepositorio compartilhamentoRepositorio;
 
+        public Sala abrirSala(Long arteId) throws BadRequestException {
+
+            if(Boolean.FALSE.equals(podeAbrirSala(arteId))){
+                throw new BadRequestException("O usuário não pode abrir sala dessa arte!");
+            }
+
+            for(Map.Entry<String, Sala> s : salas.entrySet()){
+
+                if(Objects.equals(s.getValue().arte.id, arteId)){
+
+                    s.getValue().addIntegrante(
+                            usuarioServico.getUsuarioLogadoDTO(),
+                            arteServico.permissoesPorArteUsuario(arteId, usuarioServico.getUsuarioLogadoId())
+                    );
+
+                    return s.getValue();
+                }
+
+            }
+
+            return criarSala(arteId);
+        }
+        public Sala criarSala(Long idArte) throws NoSuchElementException {
             String uuid = UUID.randomUUID().toString();
 
-            Arte arte =  arteServico.arteRepositorio.findById(idArte).orElseThrow( () -> new Exception("Arte não encontrada"));
+            Arte arte =  arteServico.arteRepositorio.findById(idArte).orElseThrow( () -> new NoSuchElementException("Arte não encontrada"));
 
             Sala sala = new Sala(uuid,arte);
+
+            sala.addIntegrante(
+                    usuarioServico.getUsuarioLogadoDTO(),
+                    arteServico.permissoesPorArteUsuario(idArte, usuarioServico.getUsuarioLogadoId())
+            );
 
             salas.put(uuid, sala);
             return sala;
@@ -63,6 +95,20 @@ public class SalaServico {
         throw new Exception("Não foi possível encontrar a susa Arte pelo ID fornecido");
 
     }
+
+    public Boolean podeAbrirSala(Long arteId) {
+
+            return
+                    arteServico.isArtePublica(arteId) ||
+
+                    compartilhamentoRepositorio.existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(
+                    arteId,
+                    Long.valueOf(usuarioServico.getUsuarioLogadoDTO().id),
+                    List.of(TipoPermissao.VISUALIZAR, TipoPermissao.EDITAR));
+
+
+        }
+
 
     // Classe Sala pode ser uma classe interna ou uma classe separada
 
