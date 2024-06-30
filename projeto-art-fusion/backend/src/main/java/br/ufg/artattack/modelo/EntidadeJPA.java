@@ -19,9 +19,6 @@ public abstract class EntidadeJPA {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-
-
-
     public Date dataCriacao;
 
 

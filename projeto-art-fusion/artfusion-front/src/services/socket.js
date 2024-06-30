@@ -12,16 +12,20 @@ class SocketService {
         const token = Cookies.get('user_token');
 
         if (token) {
-            const socketUrl = new SockJS('http://192.168.6.51:8080/artsocket');
+            const socketUrl = new SockJS('http://localhost:8080/artsocket');
             this.stompClient = Stomp.over(socketUrl);
 
-            this.stompClient.connect({ 'X-Authorization': `Bearer ${token}` }, (frame) => {
-                console.log('Connected: ' + frame);
-                this.connected = true;
-                if (callback) callback();
-            }, (error) => {
-                console.error('Connection error: ', error);
-            });
+            this.stompClient.connect(
+                { 'X-Authorization': `Bearer ${token}` },
+                (frame) => {
+                    console.log('Connected: ' + frame);
+                    this.connected = true;
+                    if (callback) callback();
+                },
+                (error) => {
+                    console.error('Connection error: ', error);
+                }
+            );
         } else {
             console.error('JWT token not found');
         }
@@ -37,10 +41,13 @@ class SocketService {
         }
     }
 
-
     sendElementUpdate(elementData) {
         if (this.stompClient && this.connected) {
-            this.stompClient.send('/envio/alteracoes', {}, JSON.stringify(elementData));
+            this.stompClient.send(
+                '/envio/alteracoes',
+                {},
+                JSON.stringify(elementData)
+            );
         } else {
             console.error('Socket is not connected');
         }

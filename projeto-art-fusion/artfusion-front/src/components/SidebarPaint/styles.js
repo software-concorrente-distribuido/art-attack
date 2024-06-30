@@ -3,17 +3,18 @@ import styled from 'styled-components';
 export const SidebarContainer = styled.div`
     width: 80px;
     height: calc(100vh - 60px); /* Altura para ficar abaixo do header */
-    background-color: #4d5358;
+    background-color: #2e3238;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 0;
+    padding: 20px 0;
     position: fixed;
     left: 0;
     top: 60px; /* Para ficar abaixo do header */
     z-index: 999;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
     overflow-y: auto; /* Barra de rolagem */
+    border-right: 1px solid #444;
 `;
 
 export const ToolButton = styled.button`
@@ -43,8 +44,8 @@ export const ColorBoxContainer = styled.div`
 `;
 
 export const ColorBox = styled.div`
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     border-radius: 100%;
     background-color: ${(props) => props.color};
     border: 1px solid #fff;
@@ -89,7 +90,8 @@ export const LineWidthLabel = styled.span`
 `;
 
 export const LineWidthButton = styled.div`
-    width: ${(props) => props.width * 2}px; /* Multiplicador para melhor visualização */
+    width: ${(props) =>
+        props.width * 2}px; /* Multiplicador para melhor visualização */
     height: ${(props) => props.width * 2}px;
     background-color: white;
     border: 1px solid #fff;
@@ -104,7 +106,6 @@ export const SelectedColorIndicator = styled.div`
     align-items: center;
     margin: 10px 0;
     position: relative;
-    
 `;
 
 export const SelectedColor = styled.div`
@@ -133,7 +134,7 @@ export const Divider = styled.div`
     width: 80%;
     height: 1px;
     background-color: #bbb;
-    margin: 10px 0;
+    margin: 8px 0;
     border-radius: 100px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 `;

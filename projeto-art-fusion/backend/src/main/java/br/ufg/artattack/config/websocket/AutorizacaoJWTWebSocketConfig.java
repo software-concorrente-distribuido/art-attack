@@ -1,8 +1,6 @@
-package br.ufg.artattack.config;
+package br.ufg.artattack.config.websocket;
 
 import br.ufg.artattack.servico.JWTServico;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +27,9 @@ import java.util.List;
 @Configuration
 @EnableWebSocketMessageBroker
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
-public class WebSocketAuthConfig implements WebSocketMessageBrokerConfigurer {
+public class AutorizacaoJWTWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketAuthConfig.class);
-
-
+    private static final Logger logger = LoggerFactory.getLogger(AutorizacaoJWTWebSocketConfig.class);
 
     @Autowired
     private JWTServico jwtServico;

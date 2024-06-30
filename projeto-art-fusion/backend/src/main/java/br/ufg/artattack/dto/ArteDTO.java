@@ -1,8 +1,6 @@
 package br.ufg.artattack.dto;
 
 import br.ufg.artattack.modelo.Arte;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 
@@ -13,9 +11,8 @@ public class ArteDTO {
 
     public Long id;
 
-    public Long usuarioId;
+    public UsuarioDTO administrador;
 
-    public String usuarioNome;
 
     public Date dataCriacao;
 
@@ -27,10 +24,9 @@ public class ArteDTO {
         this.id = arte.getId();
         this.dataCriacao = arte.dataCriacao;
         this.titulo = arte.titulo;
-        var user = arte.getUsuario();
+        var user = arte.administrador;
         if(user!=null){
-            this.usuarioId = user.getId();
-            this.usuarioNome =user.getUsername();
+           this.administrador = new UsuarioDTO(arte.administrador);
         }
     }
 
