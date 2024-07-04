@@ -20,7 +20,8 @@ const RoutesApp = () => {
                     <Route
                         exact
                         path="/home"
-                        element={<Private Item={Home} />}
+                        element={<Home/>} // deixar a rota home livre para implementação 
+                        // element={<Private Item={Home} />} -> Guardar rotas
                     />
                     <Route path="/login" element={<Login />} />
                     <Route exact path="/register" element={<Register />} />
