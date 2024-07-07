@@ -2,21 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import Title from '../../components/Title';
 import Label from '../../components/Label';
-import user from '../../assets/images/man16_117721.svg';
 import Button from '../../components/Button';
 import exit from '../../assets/icons/delete-circled-outline.svg';
 import ModalOverlayContainer from '../../components/Containers/ModalOverlayContainer'
 import EditProfileModalContainer from '../../components/Containers/EditProfileModalContainer'
 import ContainerTitleExitEditPerfil from '../../components/Containers/ContainerTitleExitEditPerfil'
-
-const ImageUser = styled.img`
-  width: 120px;
-  height: 120px;
-  display: flex;
-  margin: 0px;
-  margin-top: 16px;
-  margin-bottom: 16px;
-`;
+import Input from '../../components/Input';
+import InputPassword from '../../components/InputPassword';
 
 const IconExit = styled.img`
   width: 46px;
@@ -25,15 +17,18 @@ const IconExit = styled.img`
   margin: 0px;
 `;
 
-const LabelDados = styled.p`
+const PasswordContainer = styled.div`
   display: flex;
   width: 100%;
-  margin-left: 20px;
   margin-bottom: 20px;
 `;
 
+const ConfirmarSenha = styled.div`
+  margin-left: 50px;
+`;
 
-function EnableEditProfileModal() {
+
+function EditProfileModal() {
   return (
     <ModalOverlayContainer>
       <EditProfileModalContainer>
@@ -45,19 +40,31 @@ function EnableEditProfileModal() {
             </Title>
 
             <IconExit src={exit} alt="exit" />
-        </ContainerTitleExitEditPerfil>
+        </ContainerTitleExitEditPerfil> <br></br>
+
+        <Label>Nome do usuário</Label>
+          <Input></Input> <br></br>
+        <Label>E-mail</Label>
+          <Input></Input> <br></br>
+        <Label>Senha Atual</Label>
+          <InputPassword></InputPassword> <br></br>
+
+        <PasswordContainer>
+          <div>
+            <Label>Nova Senha</Label>
+            <InputPassword></InputPassword> <br></br>
+          </div>
+          <ConfirmarSenha>
+            <Label>Confirmar Senha</Label>
+            <InputPassword></InputPassword> <br></br>
+          </ConfirmarSenha>
+        </PasswordContainer>
         
-        <ImageUser src={user} alt="user" />
 
-        <Label>Nome:</Label>
-          <LabelDados>João Silva</LabelDados>
-        <Label>E-mail:</Label>
-          <LabelDados>joaodasilva@email.com</LabelDados>
-
-        <Button Text="Editar"/>
+        <Button Text="Salvar"/>
       </EditProfileModalContainer>
     </ModalOverlayContainer>
   );
 }
 
-export default EnableEditProfileModal;
+export default EditProfileModal;
