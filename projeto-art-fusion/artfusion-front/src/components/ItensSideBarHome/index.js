@@ -36,7 +36,7 @@ function ItensSideBarHome() {
         <ItensSideBar>
             <ItenSideBar> <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes</ItenSideBar>
             <ItenSideBar> <ImagemIten src={brushoutline}></ImagemIten>Minhas Artes</ItenSideBar>
-            <ItenSideBar> <ImagemIten src={sharesocialoutline}></ImagemIten> Compatilhadas Comigo</ItenSideBar>
+            <ItenSideBar> <ImagemIten src={sharesocialoutline}></ImagemIten> Compartilhadas Comigo</ItenSideBar>
         </ItensSideBar>
     )
 }
