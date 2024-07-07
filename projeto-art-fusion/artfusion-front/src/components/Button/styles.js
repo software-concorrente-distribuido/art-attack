@@ -4,7 +4,7 @@ export const Button = styled.button`
     padding: 16px;
     outline: none;
     border: none;
-    width: 100%;
+    width: ${props => props.widthh || '100%'};
     cursor: pointer;
     background-color: ${props => props.disabled ? '#C1C7CD' : '#0F62FE'};
     color: ${props => props.disabled ? 'white' : 'white'};
