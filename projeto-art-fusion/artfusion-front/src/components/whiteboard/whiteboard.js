@@ -10,6 +10,7 @@ import {
 } from './utils';
 import { v4 as uuid } from 'uuid';
 import { updateElement as updateElementInStore } from './whiteboardSlice';
+import { useUserId } from '../../hooks/useUserId';
 
 let selectedElement;
 
@@ -25,6 +26,7 @@ const Whiteboard = () => {
     const color = useSelector((state) => state.whiteboard.color);
     const lineWidthRef = useRef(lineWidth);
     const colorRef = useRef(color);
+    const userId = useUserId();
 
     const [action, setAction] = useState(null);
 
@@ -125,6 +127,7 @@ const Whiteboard = () => {
                         type: elements[selectedElementIndex].type,
                         lineWidth: elements[selectedElementIndex].lineWidth,
                         color: elements[selectedElementIndex].color,
+                        userId,
                     },
                     elements
                 );
