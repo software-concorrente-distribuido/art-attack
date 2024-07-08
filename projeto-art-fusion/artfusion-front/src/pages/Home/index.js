@@ -1,19 +1,33 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import Button from '../../components/Button';
-import useAuth from '../../hooks/useAuth';
 import * as C from './styles';
+import SideBar from '../../components/SideBar'
+import TopBar from '../../components/TopBar'
+import ArtesRecentes from '../../components/ArtesRecentes'
+import EditProfileModal from '../../modals/EditProfileModal'
+import styled from "styled-components"
+import ShareModal from '../../modals/ShareModal'
+
+const ConteinerArtesRecentesSideBar = styled.div`
+    display: flex;
+`
+
+/*
+
+<ConteinerArtesRecentesSideBar>
+                <ArtesRecentes></ArtesRecentes>
+                <SideBar></SideBar>
+            </ConteinerArtesRecentesSideBar>
+
+
+
+
+            <EditProfileModal></EditProfileModal>
+*/
 
 const Home = () => {
-    const { signout } = useAuth();
-    const navigate = useNavigate();
-
     return (
         <C.Container>
-            <C.Title>Home</C.Title>
-            <Button Text="Sair" onClick={() => [signout(), navigate('/')]}>
-                Sair
-            </Button>
+            <ShareModal></ShareModal>
         </C.Container>
     );
 };
