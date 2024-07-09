@@ -22,31 +22,26 @@ export const updateElement = (
 ) => {
     const elementsCopy = [...elements];
 
-    console.error('Sala UUID - updateElement:', salaUUID);
-    console.error('USER - updateElement:', userId);
-    console.error('Arte - updateElement:', arteId);
-
     try {
         switch (type) {
             case toolTypes.CIRCLE:
-                // Recalcular o raio com base nos novos x2 e y2
-                const dx = x2 - elementsCopy[index].x1;
-                const dy = y2 - elementsCopy[index].y1;
+                // Calcular o raio com base nos novos x2 e y2
+                const dx = x2 - x1;
+                const dy = y2 - y1;
                 const radius = Math.sqrt(dx * dx + dy * dy);
+                console.log('raio no update element', radius, x1, x2, y1, y2);
 
-                // Atualizar o elemento círculo com as novas propriedades
                 const updatedCircleElement = createElement({
                     id,
-                    x1: elementsCopy[index].x1,
-                    y1: elementsCopy[index].y1,
+                    x1,
+                    y1,
                     x2,
                     y2,
                     toolType: type,
-                    lineWidth: elementsCopy[index].lineWidth,
+                    lineWidth,
                     color: elementsCopy[index].color,
+                    radius, // Adiciona o raio ao elemento
                 });
-
-                updatedCircleElement.element.radius = radius; // Garantir que o raio esteja atualizado
 
                 elementsCopy[index] = updatedCircleElement;
 
@@ -77,7 +72,7 @@ export const updateElement = (
 
                 socketService.sendElementUpdate(
                     salaUUID,
-                    formatDrawingData(updatedCircleElement, arteId, userId)
+                    formatDrawingData(updatedElement, arteId, userId)
                 );
                 break;
             case toolTypes.PENCIL:
@@ -123,6 +118,7 @@ export const updateElement = (
                 store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
+                    salaUUID,
                     formatDrawingData(updatedSprayElement, 1, userId)
                 );
                 break;

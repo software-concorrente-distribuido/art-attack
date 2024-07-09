@@ -11,7 +11,9 @@ const generateSquare = ({ x1, y1, x2, y2 }) => {
 };
 
 const generateCircle = ({ x1, y1, x2, y2 }) => {
-    const radius = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const radius = Math.sqrt(dx * dx + dy * dy);
     console.log('raiooooooooooooooooooooo', radius, x1, x2, y1, y2);
     return {
         x: x1,
@@ -21,14 +23,12 @@ const generateCircle = ({ x1, y1, x2, y2 }) => {
 };
 
 const generateTriangle = ({ x1, y1, x2, y2 }) => {
-    let dx = x2 - x1;
-    let dy = y2 - y1;
-    let dist = Math.sqrt(dx * dx + dy * dy);
-    let angle = Math.atan2(dy, dx);
+    const dx = x2 - x1;
+    const dy = y2 - y1;
 
-    let height = dist / Math.sqrt(3); // Altura do triângulo equilátero
-    let x3 = x1 + dx / 2 - height * Math.sin(angle);
-    let y3 = y1 + dy / 2 + height * Math.cos(angle);
+    // Calcular o terceiro ponto do triângulo
+    const x3 = x1 - dx;
+    const y3 = y2;
 
     return {
         x1,
@@ -61,8 +61,6 @@ export const createElement = ({
 }) => {
     let element;
 
-    console.log('!!!!!!!!x1, x2, y1, y2', x1, y1, x2, y2);
-
     try {
         switch (toolType) {
             case toolTypes.SQUARE:
@@ -85,8 +83,10 @@ export const createElement = ({
                     id,
                     element,
                     type: toolType,
-                    x: element.x,
-                    y: element.y,
+                    x1,
+                    y1,
+                    x2,
+                    y2,
                     radius: element.radius,
                     lineWidth,
                     color,

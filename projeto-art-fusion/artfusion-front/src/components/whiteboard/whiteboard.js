@@ -2,6 +2,7 @@ import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { toolTypes, actions } from '../../constants';
+import { clearElements } from './whiteboardSlice';
 import {
     createElement,
     updateElement,
@@ -50,6 +51,7 @@ const Whiteboard = () => {
         ctx.globalCompositeOperation = 'source-over';
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        // redesenha os elementos sempre que o estado elements do Redux é alterado
         elements.forEach((element) => {
             drawElement({ context: ctx, element });
         });
@@ -59,6 +61,14 @@ const Whiteboard = () => {
         lineWidthRef.current = lineWidth;
         colorRef.current = color;
     }, [lineWidth, color]);
+
+    // Limpa os elementos quando o componente é desmontado
+    useEffect(() => {
+        return () => {
+            console.log('SAIU');
+            dispatch(clearElements());
+        };
+    }, [dispatch]);
 
     const handleMouseDown = (event) => {
         const { clientX, clientY } = getMousePosition(event);
@@ -109,10 +119,6 @@ const Whiteboard = () => {
                     elements[selectedElementIndex]
                 );
 
-                console.error('Sala UUID - whiteboard:', salaUUID);
-                console.error('Arte ID - whiteboard:', arteId);
-                console.error('user ID - whiteboard:', userId);
-
                 updateElement(
                     {
                         id: selectedElement.id,
@@ -148,10 +154,6 @@ const Whiteboard = () => {
             const index = elements.findIndex(
                 (el) => el.id === selectedElement.id
             );
-
-            console.error('Sala UUID - whiteboard:', salaUUID);
-            console.error('Arte ID - whiteboard:', arteId);
-            console.error('user ID - whiteboard:', userId);
 
             if (index !== -1) {
                 updateElement(

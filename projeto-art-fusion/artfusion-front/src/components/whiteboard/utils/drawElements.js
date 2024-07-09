@@ -10,23 +10,24 @@ const drawRectangle = (context, { x1, y1, x2, y2, lineWidth, color }) => {
     context.stroke();
 };
 
-const drawCircle = (context, { x, y, radius, lineWidth, color }) => {
-    console.log('RAIOOO ', radius, x, y);
+const drawCircle = (context, { x1, y1, x2, y2, lineWidth, color }) => {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const radius = Math.sqrt(dx * dx + dy * dy);
+
     if (radius > 0) {
         context.beginPath();
-        context.arc(x, y, radius, 0, 2 * Math.PI);
+        context.arc(x1, y1, radius, 0, 2 * Math.PI);
         context.strokeStyle = color;
         context.lineWidth = lineWidth;
         context.stroke();
     }
 };
 
-const drawTriangle = (context, { x1, y1, x2, y2, lineWidth, color }) => {
-    // Calculando o terceiro ponto do triângulo equilátero
-    let height = (y2 - y1) * Math.sin(Math.PI / 3);
-    let x3 = (x1 + x2) / 2;
-    let y3 = y1 - height;
-
+const drawTriangle = (
+    context,
+    { x1, y1, x2, y2, x3, y3, lineWidth, color }
+) => {
     context.beginPath();
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);

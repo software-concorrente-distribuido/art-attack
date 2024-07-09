@@ -42,7 +42,7 @@ class SocketService {
     }
 
     sendElementUpdate(salaUUID, elementData) {
-        console.debug('****** SALA UUID:', salaUUID);
+        console.debug('****** SALA UUID ******', salaUUID);
         console.debug('ELEMENT DATA', elementData);
         if (this.stompClient && this.connected) {
             this.stompClient.send(
