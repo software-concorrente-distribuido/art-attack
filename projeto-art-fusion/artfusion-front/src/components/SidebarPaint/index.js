@@ -129,9 +129,9 @@ const Sidebar = () => {
             <ToolButton src={brushIcon} type={toolTypes.PENCIL} />
             {/*<ToolButton src={sprayIcon} type={toolTypes.SPRAY} />*/}
             <ToolButton src={eraserIcon} type={toolTypes.ERASER} />
-            {/* <ToolButton src={circleIcon} type={toolTypes.CIRCLE} /> */}
+            <ToolButton src={circleIcon} type={toolTypes.CIRCLE} />
             <ToolButton src={squareIcon} type={toolTypes.SQUARE} />
-            {/* <ToolButton src={triangleIcon} type={toolTypes.TRIANGLE} /> */}
+            <ToolButton src={triangleIcon} type={toolTypes.TRIANGLE} />
             <ToolButton src={lineIcon} type={toolTypes.LINE} />
 
             <IconButton

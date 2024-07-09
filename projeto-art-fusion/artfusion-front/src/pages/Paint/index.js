@@ -27,6 +27,8 @@ const Paint = () => {
         };
     }, [dispatch, salaUUID]);
 
+    // Esse método conecta ao socket e se inscreve no tópico de alterações,
+    // atualizando o estado do Redux quando uma mensagem é recebida.
     const setupSocket = () => {
         if (salaUUID) {
             socketService.connect(() => {
@@ -44,7 +46,9 @@ const Paint = () => {
                         }
 
                         try {
-                            console.log('Delta received:', message.delta);
+                            //console.log('Delta received:', message.delta);
+
+                            //atualiza o redux para desenhar os elementos recebidos
                             dispatch(updateElementInStore(message.delta));
                         } catch (error) {
                             console.error('Erro ao obter o delta:', error);

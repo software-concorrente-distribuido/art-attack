@@ -1,16 +1,19 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
-const initialState ={
+const initialState = {
     tool: null,
     elements: [],
     lineWidth: 2, // Valor inicial para a espessura da linha
-    color: '#000000'
-}
+    color: '#000000',
+};
 
 const whiteboardSlice = createSlice({
     name: 'whiteboard',
     initialState,
     reducers: {
+        clearElements: (state) => {
+            state.elements = [];
+        },
         setToolType: (state, action) => {
             state.tool = action.payload;
         },
@@ -23,9 +26,11 @@ const whiteboardSlice = createSlice({
         updateElement: (state, action) => {
             const { id } = action.payload;
 
-            const index = state.elements.findIndex(element => element.id === id);
+            const index = state.elements.findIndex(
+                (element) => element.id === id
+            );
 
-            if(index === -1) {
+            if (index === -1) {
                 state.elements.push(action.payload);
             } else {
                 state.elements[index] = action.payload;
@@ -37,6 +42,13 @@ const whiteboardSlice = createSlice({
     },
 });
 
-export const { setToolType, setLineWidth, setColor, updateElement, setElements } = whiteboardSlice.actions;
+export const {
+    setToolType,
+    setLineWidth,
+    setColor,
+    updateElement,
+    setElements,
+    clearElements,
+} = whiteboardSlice.actions;
 
 export default whiteboardSlice.reducer;
