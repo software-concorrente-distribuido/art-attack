@@ -41,10 +41,12 @@ class SocketService {
         }
     }
 
-    sendElementUpdate(elementData) {
+    sendElementUpdate(salaUUID, elementData) {
+        console.debug('****** SALA UUID:', salaUUID);
+        console.debug('ELEMENT DATA', elementData);
         if (this.stompClient && this.connected) {
             this.stompClient.send(
-                '/envio/alteracoes',
+                `/envio/alteracoes/${salaUUID}`,
                 {},
                 JSON.stringify(elementData)
             );

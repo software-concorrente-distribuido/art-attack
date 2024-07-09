@@ -9,10 +9,10 @@ const App = () => {
     return (
         <>
             <Provider store={store}>
-            <AuthProvider>
-                <RoutesApp />
-                <GlobalStyle />
-            </AuthProvider>
+                <AuthProvider>
+                    <RoutesApp />
+                    <GlobalStyle />
+                </AuthProvider>
             </Provider>
         </>
     );

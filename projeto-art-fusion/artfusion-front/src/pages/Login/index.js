@@ -28,7 +28,7 @@ const Login = () => {
             return;
         }
 
-        navigate('/paint');
+        navigate('/home');
     };
 
     const isFormValid = email && password;
@@ -36,13 +36,13 @@ const Login = () => {
     return (
         <C.Container>
             <C.Content>
-            <C.ImageContainer>
-                <C.Image src={logo} alt="ArtFusion" />
-                <C.TitleText>ArtFusion</C.TitleText>
-            </C.ImageContainer>
-            <C.Label style={{ paddingBottom : '20px' }}>
-                Por favor, faça login para continuar.
-            </C.Label>
+                <C.ImageContainer>
+                    <C.Image src={logo} alt="ArtFusion" />
+                    <C.TitleText>ArtFusion</C.TitleText>
+                </C.ImageContainer>
+                <C.Label style={{ paddingBottom: '20px' }}>
+                    Por favor, faça login para continuar.
+                </C.Label>
 
                 <Input
                     type="email"
@@ -60,8 +60,12 @@ const Login = () => {
                     ]}
                 />
                 <C.LabelError>{error}</C.LabelError>
-                <Button Text="Entrar" onClick={handleLogin} disabled={!isFormValid} />
-                <C.Label style={{paddingTop : '20px'}}>
+                <Button
+                    Text="Entrar"
+                    onClick={handleLogin}
+                    disabled={!isFormValid}
+                />
+                <C.Label style={{ paddingTop: '20px' }}>
                     Não tem uma conta?
                     <C.Strong>
                         <Link to="/register">&nbsp;Registre-se</Link>

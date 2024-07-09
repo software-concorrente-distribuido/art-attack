@@ -5,6 +5,7 @@ import Register from '../pages/Register';
 import Login from '../pages/Login';
 import useAuth from '../hooks/useAuth';
 import Paint from '../pages/Paint';
+import HomeTempo from '../pages/HomeTempo';
 
 const Private = ({ Item }) => {
     const { signed } = useAuth();
@@ -20,14 +21,16 @@ const RoutesApp = () => {
                     <Route
                         exact
                         path="/home"
-                        element={<Home/>} // deixar a rota home livre para implementação 
-                        // element={<Private Item={Home} />} -> Guardar rotas
+                        //element={<HomeTempo />} // deixar a rota home livre para implementação
+                        element={<Private Item={HomeTempo} />}
                     />
                     <Route path="/login" element={<Login />} />
                     <Route exact path="/register" element={<Register />} />
                     <Route path="*" element={<Login />} />
-                    <Route path="/paint"
-                        element={<Paint />} />
+                    <Route
+                        path="/paint/:arteId/:salaUUID"
+                        element={<Private Item={Paint} />}
+                    />
                 </Routes>
             </Fragment>
         </BrowserRouter>

@@ -15,9 +15,16 @@ const formatDrawingData = (element, arteId, usuarioId) => {
 
 export const updateElement = (
     { id, x1, x2, y1, y2, type, index, lineWidth },
-    elements
+    elements,
+    userId,
+    arteId,
+    salaUUID
 ) => {
     const elementsCopy = [...elements];
+
+    console.error('Sala UUID - updateElement:', salaUUID);
+    console.error('USER - updateElement:', userId);
+    console.error('Arte - updateElement:', arteId);
 
     try {
         switch (type) {
@@ -46,7 +53,8 @@ export const updateElement = (
                 store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
-                    formatDrawingData(updatedCircleElement, 1, 1)
+                    salaUUID,
+                    formatDrawingData(updatedCircleElement, arteId, userId)
                 );
                 break;
             case toolTypes.TRIANGLE:
@@ -68,7 +76,8 @@ export const updateElement = (
                 store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
-                    formatDrawingData(updatedElement, 1, 1)
+                    salaUUID,
+                    formatDrawingData(updatedCircleElement, arteId, userId)
                 );
                 break;
             case toolTypes.PENCIL:
@@ -88,7 +97,8 @@ export const updateElement = (
                 store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
-                    formatDrawingData(updatedPencilElement, 1, 1)
+                    salaUUID,
+                    formatDrawingData(updatedPencilElement, arteId, userId)
                 );
                 break;
             case toolTypes.SPRAY:
@@ -113,7 +123,7 @@ export const updateElement = (
                 store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
-                    formatDrawingData(updatedSprayElement, 1, 1)
+                    formatDrawingData(updatedSprayElement, 1, userId)
                 );
                 break;
             case toolTypes.ERASER:
@@ -130,7 +140,8 @@ export const updateElement = (
                 const updatedEraserElement = elementsCopy[index];
                 store.dispatch(setElements(elementsCopy));
                 socketService.sendElementUpdate(
-                    formatDrawingData(updatedEraserElement, 1, 1)
+                    salaUUID,
+                    formatDrawingData(updatedEraserElement, arteId, userId)
                 );
                 break;
             default:
