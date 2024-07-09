@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from '../../components/HeaderPaint';
 import Sidebar from '../../components/SidebarPaint';
 import socketService from '../../services/socket';
-import ApiServices from '../../services/apiServices';
 import Cookies from 'js-cookie';
 import Whiteboard from '../../components/whiteboard/whiteboard';
 import { updateElement as updateElementInStore } from '../../components/whiteboard/whiteboardSlice';
@@ -10,21 +10,14 @@ import { useDispatch } from 'react-redux';
 
 const Paint = () => {
     const dispatch = useDispatch();
-    const [salaUUID, setSalaUUID] = useState(null);
+    const { arteId, salaUUID } = useParams();
 
+    //TODO: fazer a reconexão
     useEffect(() => {
         const token = Cookies.get('user_token');
 
         if (token) {
-            ApiServices.abrirSala(1, token)
-                .then((salaUUID) => {
-                    console.debug('Sala uid', salaUUID);
-                    setSalaUUID(salaUUID); // Diretamente seta o UUID retornado
-                    setupSocket(salaUUID);
-                })
-                .catch((error) => {
-                    console.error('Erro ao abrir a sala:', error);
-                });
+            setupSocket();
         } else {
             console.error('JWT token não encontrado.');
         }
@@ -32,9 +25,9 @@ const Paint = () => {
         return () => {
             socketService.disconnect();
         };
-    }, [dispatch]);
+    }, [dispatch, salaUUID]);
 
-    const setupSocket = (salaUUID) => {
+    const setupSocket = () => {
         if (salaUUID) {
             socketService.connect(() => {
                 console.log('Subscribing to /topic/alteracoes...', salaUUID);

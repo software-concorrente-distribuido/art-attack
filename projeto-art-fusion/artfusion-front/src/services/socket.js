@@ -2,15 +2,13 @@ import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import Cookies from 'js-cookie';
 
-// TODO: sala do socket
-
 class SocketService {
     constructor() {
         this.stompClient = null;
         this.connected = false;
     }
 
-    connect(salaUUID, callback) {
+    connect(callback) {
         const token = Cookies.get('user_token');
 
         if (token) {
@@ -33,23 +31,22 @@ class SocketService {
         }
     }
 
-    subscribe(salaUUID, callback) {
+    subscribe(topic, callback) {
         if (this.stompClient && this.connected) {
-            this.stompClient.subscribe(
-                '/topic/alteracoes/${salaUUID}',
-                (message) => {
-                    callback(JSON.parse(message.body));
-                }
-            );
+            this.stompClient.subscribe(topic, (message) => {
+                callback(JSON.parse(message.body));
+            });
         } else {
             console.error('Socket is not connected');
         }
     }
 
     sendElementUpdate(salaUUID, elementData) {
+        console.debug('****** SALA UUID:', salaUUID);
+        console.debug('ELEMENT DATA', elementData);
         if (this.stompClient && this.connected) {
             this.stompClient.send(
-                '/envio/alteracoes/${salaUUID}',
+                `/envio/alteracoes/${salaUUID}`,
                 {},
                 JSON.stringify(elementData)
             );

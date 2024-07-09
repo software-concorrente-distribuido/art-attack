@@ -25,6 +25,40 @@ class ApiServices {
             throw error; // Lançar o erro para ser tratado por quem chamar essa função
         }
     }
+
+    // Função para listar todas as artes
+    static async listarArtes() {
+        console.debug('listando artees');
+        try {
+            const response = await api.get('/arte/listar');
+            console.debug(response);
+            return response.data; // Retorna diretamente o array de artes
+        } catch (error) {
+            console.error('Erro ao listar artes:', error);
+            throw error;
+        }
+    }
+
+    // Função para criar uma arte
+    static async criarArte(nomeArte, accessToken) {
+        console.debug('nome arte::: ', nomeArte);
+        try {
+            const response = await api.post(
+                '/arte/criar',
+                { titulo: nomeArte },
+                {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            return response.data; // Retorna a arte criada
+        } catch (error) {
+            console.error('Erro ao criar arte:', error);
+            throw error;
+        }
+    }
 }
 
 export default ApiServices;

@@ -1,4 +1,5 @@
 import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { toolTypes, actions } from '../../constants';
 import {
@@ -27,6 +28,7 @@ const Whiteboard = () => {
     const lineWidthRef = useRef(lineWidth);
     const colorRef = useRef(color);
     const userId = useUserId();
+    const { arteId, salaUUID } = useParams();
 
     const [action, setAction] = useState(null);
 
@@ -60,7 +62,6 @@ const Whiteboard = () => {
 
     const handleMouseDown = (event) => {
         const { clientX, clientY } = getMousePosition(event);
-        //console.log(toolType);
 
         if (!toolType) {
             console.log('Nenhuma ferramenta selecionada!');
@@ -77,14 +78,6 @@ const Whiteboard = () => {
             toolType === toolTypes.TRIANGLE
         ) {
             setAction(actions.DRAWING);
-
-            console.log(
-                '@@@@@@@@@@@ x1, x2, y1, y2',
-                clientX,
-                clientX,
-                clientY,
-                clientY
-            );
 
             const element = createElement({
                 x1: clientX,
@@ -116,6 +109,10 @@ const Whiteboard = () => {
                     elements[selectedElementIndex]
                 );
 
+                console.error('Sala UUID - whiteboard:', salaUUID);
+                console.error('Arte ID - whiteboard:', arteId);
+                console.error('user ID - whiteboard:', userId);
+
                 updateElement(
                     {
                         id: selectedElement.id,
@@ -127,9 +124,11 @@ const Whiteboard = () => {
                         type: elements[selectedElementIndex].type,
                         lineWidth: elements[selectedElementIndex].lineWidth,
                         color: elements[selectedElementIndex].color,
-                        userId,
                     },
-                    elements
+                    elements,
+                    userId,
+                    arteId,
+                    salaUUID
                 );
             }
         }
@@ -150,6 +149,10 @@ const Whiteboard = () => {
                 (el) => el.id === selectedElement.id
             );
 
+            console.error('Sala UUID - whiteboard:', salaUUID);
+            console.error('Arte ID - whiteboard:', arteId);
+            console.error('user ID - whiteboard:', userId);
+
             if (index !== -1) {
                 updateElement(
                     {
@@ -163,7 +166,10 @@ const Whiteboard = () => {
                         lineWidth: elements[index].lineWidth,
                         color: elements[index].color,
                     },
-                    elements
+                    elements,
+                    userId,
+                    arteId,
+                    salaUUID
                 );
             }
         }
