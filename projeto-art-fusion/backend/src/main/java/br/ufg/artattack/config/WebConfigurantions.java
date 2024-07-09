@@ -57,6 +57,7 @@ public class WebConfigurantions {
         configuration.addAllowedOriginPattern("http:\\/\\/localhost:[0-9]*");
         configuration.addAllowedOrigin("https://api.getpostman.com");
         configuration.addAllowedOrigin("http://localhost:3000"); // Permitir todas as origens
+        configuration.addAllowedOrigin("http://172.16.6.206:3000"); // Permitir todas as origens
         configuration.addAllowedMethod("GET"); // Permitir todos os métodos HTTP
         configuration.addAllowedMethod("POST"); // Permitir todos os métodos HTTP
 

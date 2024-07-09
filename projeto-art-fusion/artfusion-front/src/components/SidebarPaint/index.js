@@ -11,14 +11,10 @@ import sprayIcon from '../../assets/icons/spray.svg';
 import circleIcon from '../../assets/icons/circle.svg';
 import { SketchPicker } from 'react-color';
 import { toolTypes } from '../../constants';
-import { useDispatch, useSelector } from 'react-redux';
 import * as S from './styles';
 import './styles.css';
-import {
-    setToolType,
-    setLineWidth,
-    setColor,
-} from '../whiteboard/whiteboardSlice';
+import store from '../whiteboard/whiteboardStore';
+import { observer } from 'mobx-react';
 
 const lineWidths = [1, 2, 3, 4, 5, 10, 20];
 
@@ -33,13 +29,11 @@ const colors = [
     '#ffffff',
 ];
 
-const ToolButton = ({ src, type }) => {
-    const dispatch = useDispatch();
-
-    const selectedToolType = useSelector((state) => state.whiteboard.tool);
+const ToolButton = observer(({ src, type }) => {
+    const selectedToolType = store.tool;
 
     const handleToolChange = () => {
-        dispatch(setToolType(type));
+        store.setToolType(type);
     };
 
     const className =
@@ -50,7 +44,7 @@ const ToolButton = ({ src, type }) => {
             <img width="80%" src={src} />
         </button>
     );
-};
+});
 
 const IconButton = ({ src, onClick }) => {
     return (
@@ -76,26 +70,23 @@ const ColorPickerButton = ({ src, onClick, color }) => {
     );
 };
 
-const Sidebar = () => {
+const Sidebar = observer(() => {
     const [showLineWidths, setShowLineWidths] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
     const popupRef = useRef(null);
     const colorPickerRef = useRef(null);
-    const dispatch = useDispatch();
-    const lineWidth = useSelector((state) => state.whiteboard.lineWidth); // Obtendo a espessura da linha do estado
-    const color = useSelector((state) => state.whiteboard.color);
+    const lineWidth = store.lineWidth; // Obtendo a espessura da linha da store
+    const color = store.color;
 
     useEffect(() => {
-        // Adicionar listener para cliques fora do popup
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            // Limpar listener
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
     const handleLineWidthChange = (lineWidth) => {
-        dispatch(setLineWidth(lineWidth));
+        store.setLineWidth(lineWidth);
         setShowLineWidths(false); // Esconder o popup após a seleção
     };
 
@@ -117,7 +108,7 @@ const Sidebar = () => {
     };
 
     const handleColorChange = (color) => {
-        dispatch(setColor(color.hex));
+        store.setColor(color.hex);
     };
 
     const handlePaletteClick = () => {
@@ -184,6 +175,6 @@ const Sidebar = () => {
             )}
         </S.SidebarContainer>
     );
-};
+});
 
 export default Sidebar;

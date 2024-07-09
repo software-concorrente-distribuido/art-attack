@@ -12,7 +12,7 @@ class SocketService {
         const token = Cookies.get('user_token');
 
         if (token) {
-            const socketUrl = new SockJS('http://localhost:8080/artsocket');
+            const socketUrl = new SockJS('http://172.16.6.206:8080/artsocket');
             this.stompClient = Stomp.over(socketUrl);
 
             this.stompClient.connect(

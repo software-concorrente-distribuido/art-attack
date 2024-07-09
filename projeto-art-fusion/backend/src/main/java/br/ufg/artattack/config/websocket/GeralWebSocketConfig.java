@@ -28,6 +28,7 @@ public class GeralWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // endpoint para conexão do socket. não tem nada a ver com os acima
         registry.addEndpoint("/artsocket").setAllowedOrigins("http://localhost:3000")
+                .setAllowedOrigins("http://172.16.6.206:3000")
                 .withSockJS();
     }
 

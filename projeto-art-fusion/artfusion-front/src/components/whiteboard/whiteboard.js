@@ -1,8 +1,7 @@
 import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { observer } from 'mobx-react';
 import { toolTypes, actions } from '../../constants';
-import { clearElements } from './whiteboardSlice';
 import {
     createElement,
     updateElement,
@@ -11,8 +10,9 @@ import {
     adjustElementCoordinates,
 } from './utils';
 import { v4 as uuid } from 'uuid';
-import { updateElement as updateElementInStore } from './whiteboardSlice';
 import { useUserId } from '../../hooks/useUserId';
+import store from './whiteboardStore';
+import { autorun } from 'mobx';
 
 let selectedElement;
 
@@ -20,22 +20,12 @@ const setSelectedElement = (el) => {
     selectedElement = el;
 };
 
-const Whiteboard = () => {
+const Whiteboard = observer(() => {
     const canvasRef = useRef();
-    const toolType = useSelector((state) => state.whiteboard.tool);
-    const elements = useSelector((state) => state.whiteboard.elements);
-    const lineWidth = useSelector((state) => state.whiteboard.lineWidth);
-    const color = useSelector((state) => state.whiteboard.color);
-    const lineWidthRef = useRef(lineWidth);
-    const colorRef = useRef(color);
     const userId = useUserId();
     const { arteId, salaUUID } = useParams();
-
     const [action, setAction] = useState(null);
 
-    const dispatch = useDispatch();
-
-    //pegando a posição do mouse relativo ao canvas e não à janela
     const getMousePosition = (event) => {
         const canvasRect = canvasRef.current.getBoundingClientRect();
         return {
@@ -44,48 +34,62 @@ const Whiteboard = () => {
         };
     };
 
-    useLayoutEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
+    // useLayoutEffect(() => {
+    //     const canvas = canvasRef.current;
+    //     const ctx = canvas.getContext('2d');
 
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //     ctx.globalCompositeOperation = 'source-over';
+    //     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // redesenha os elementos sempre que o estado elements do Redux é alterado
-        elements.forEach((element) => {
-            drawElement({ context: ctx, element });
-        });
-    }, [elements]);
+    //     console.log(
+    //         'Redrawing elements:',
+    //         store.elements.map((e) => e.id)
+    //     );
 
-    useEffect(() => {
-        lineWidthRef.current = lineWidth;
-        colorRef.current = color;
-    }, [lineWidth, color]);
+    //     store.elements.forEach((element) => {
+    //         drawElement({ context: ctx, element });
+    //     });
+    // }, [store.elements]);
 
-    // Limpa os elementos quando o componente é desmontado
     useEffect(() => {
         return () => {
-            console.log('SAIU');
-            dispatch(clearElements());
+            store.clearElements();
         };
-    }, [dispatch]);
+    }, []);
+
+    useEffect(() => {
+        const disposer = autorun(() => {
+            // Esta função será chamada sempre que `store.elements` mudar
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                store.elements.forEach((element) => {
+                    drawElement({ context: ctx, element });
+                });
+            }
+        });
+
+        return () => disposer(); // Limpar o autorun quando o componente desmontar
+    }, []); // Dependências vazias significam que isso só é configurado uma vez
 
     const handleMouseDown = (event) => {
         const { clientX, clientY } = getMousePosition(event);
 
-        if (!toolType) {
+        if (!store.tool) {
             console.log('Nenhuma ferramenta selecionada!');
             return;
         }
 
         if (
-            toolType === toolTypes.SQUARE ||
-            toolType === toolTypes.LINE ||
-            toolType === toolTypes.PENCIL ||
-            toolType === toolTypes.SPRAY ||
-            toolType === toolTypes.ERASER ||
-            toolType === toolTypes.CIRCLE ||
-            toolType === toolTypes.TRIANGLE
+            store.tool === toolTypes.SQUARE ||
+            store.tool === toolTypes.LINE ||
+            store.tool === toolTypes.PENCIL ||
+            store.tool === toolTypes.SPRAY ||
+            store.tool === toolTypes.ERASER ||
+            store.tool === toolTypes.CIRCLE ||
+            store.tool === toolTypes.TRIANGLE
         ) {
             setAction(actions.DRAWING);
 
@@ -94,29 +98,26 @@ const Whiteboard = () => {
                 y1: clientY,
                 x2: clientX,
                 y2: clientY,
-                toolType,
+                toolType: store.tool,
                 id: uuid(),
-                lineWidth: lineWidthRef.current,
-                color: colorRef.current,
+                lineWidth: store.lineWidth,
+                color: store.color,
             });
 
             setSelectedElement(element);
-
-            dispatch(updateElementInStore(element));
+            store.updateElement(element);
         }
     };
 
     const handleMouseUp = () => {
-        const selectedElementIndex = elements.findIndex(
+        const selectedElementIndex = store.elements.findIndex(
             (el) => el.id === selectedElement?.id
         );
 
         if (selectedElementIndex !== -1) {
-            // ajustar a coordenada de alguns elementos para implementar
-            // a lógica de mover/redimensionar elementos posteriormente
-            if (adjustmentRequired(elements[selectedElementIndex].type)) {
+            if (adjustmentRequired(store.elements[selectedElementIndex].type)) {
                 const { x1, y1, x2, y2 } = adjustElementCoordinates(
-                    elements[selectedElementIndex]
+                    store.elements[selectedElementIndex]
                 );
 
                 updateElement(
@@ -127,11 +128,12 @@ const Whiteboard = () => {
                         x2,
                         y1,
                         y2,
-                        type: elements[selectedElementIndex].type,
-                        lineWidth: elements[selectedElementIndex].lineWidth,
-                        color: elements[selectedElementIndex].color,
+                        type: store.elements[selectedElementIndex].type,
+                        lineWidth:
+                            store.elements[selectedElementIndex].lineWidth,
+                        color: store.elements[selectedElementIndex].color,
                     },
-                    elements,
+                    store.elements,
                     userId,
                     arteId,
                     salaUUID
@@ -148,10 +150,8 @@ const Whiteboard = () => {
 
         const { clientX, clientY } = getMousePosition(event);
 
-        //está desenhando?
         if (action === actions.DRAWING) {
-            // procurando o index do elemento selecionado
-            const index = elements.findIndex(
+            const index = store.elements.findIndex(
                 (el) => el.id === selectedElement.id
             );
 
@@ -159,16 +159,16 @@ const Whiteboard = () => {
                 updateElement(
                     {
                         index,
-                        id: elements[index].id,
-                        x1: elements[index].x1,
-                        y1: elements[index].y1,
+                        id: store.elements[index].id,
+                        x1: store.elements[index].x1,
+                        y1: store.elements[index].y1,
                         x2: clientX,
                         y2: clientY,
-                        type: elements[index].type,
-                        lineWidth: elements[index].lineWidth,
-                        color: elements[index].color,
+                        type: store.elements[index].type,
+                        lineWidth: store.elements[index].lineWidth,
+                        color: store.elements[index].color,
                     },
-                    elements,
+                    store.elements,
                     userId,
                     arteId,
                     salaUUID
@@ -178,24 +178,22 @@ const Whiteboard = () => {
     };
 
     return (
-        <>
-            <canvas
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseMove={handleMouseMove}
-                ref={canvasRef}
-                width={window.innerWidth - 80}
-                height={window.innerHeight - 60}
-                style={{
-                    marginLeft: '80px',
-                    marginTop: '60px',
-                    backgroundColor: 'transparent',
-                    position: 'absolute',
-                    zIndex: 1,
-                }}
-            />
-        </>
+        <canvas
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            ref={canvasRef}
+            width={window.innerWidth - 80}
+            height={window.innerHeight - 60}
+            style={{
+                marginLeft: '80px',
+                marginTop: '60px',
+                backgroundColor: 'transparent',
+                position: 'absolute',
+                zIndex: 1,
+            }}
+        />
     );
-};
+});
 
 export default Whiteboard;

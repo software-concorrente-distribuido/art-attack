@@ -1,9 +1,8 @@
 import { createElement } from './createElement';
 import { toolTypes } from '../../../constants';
-import { store } from '../../../store/store';
-import { setElements } from '../whiteboardSlice';
 import socketService from '../../../services/socket';
 import { generateSprayPoints } from './generateSprayPoints';
+import store from '../whiteboardStore';
 
 const formatDrawingData = (element, arteId, usuarioId) => {
     return {
@@ -25,11 +24,9 @@ export const updateElement = (
     try {
         switch (type) {
             case toolTypes.CIRCLE:
-                // Calcular o raio com base nos novos x2 e y2
                 const dx = x2 - x1;
                 const dy = y2 - y1;
                 const radius = Math.sqrt(dx * dx + dy * dy);
-                console.log('raio no update element', radius, x1, x2, y1, y2);
 
                 const updatedCircleElement = createElement({
                     id,
@@ -40,12 +37,12 @@ export const updateElement = (
                     toolType: type,
                     lineWidth,
                     color: elementsCopy[index].color,
-                    radius, // Adiciona o raio ao elemento
+                    radius,
                 });
 
                 elementsCopy[index] = updatedCircleElement;
 
-                store.dispatch(setElements(elementsCopy));
+                store.setElements(elementsCopy);
 
                 socketService.sendElementUpdate(
                     salaUUID,
@@ -68,7 +65,7 @@ export const updateElement = (
 
                 elementsCopy[index] = updatedElement;
 
-                store.dispatch(setElements(elementsCopy));
+                store.setElements(elementsCopy);
 
                 socketService.sendElementUpdate(
                     salaUUID,
@@ -89,7 +86,7 @@ export const updateElement = (
 
                 const updatedPencilElement = elementsCopy[index];
 
-                store.dispatch(setElements(elementsCopy));
+                store.setElements(elementsCopy);
 
                 socketService.sendElementUpdate(
                     salaUUID,
@@ -115,7 +112,7 @@ export const updateElement = (
 
                 const updatedSprayElement = elementsCopy[index];
 
-                store.dispatch(setElements(elementsCopy));
+                store.setElements(elementsCopy);
 
                 socketService.sendElementUpdate(
                     salaUUID,
@@ -134,7 +131,9 @@ export const updateElement = (
                     ],
                 };
                 const updatedEraserElement = elementsCopy[index];
-                store.dispatch(setElements(elementsCopy));
+
+                store.setElements(elementsCopy);
+
                 socketService.sendElementUpdate(
                     salaUUID,
                     formatDrawingData(updatedEraserElement, arteId, userId)

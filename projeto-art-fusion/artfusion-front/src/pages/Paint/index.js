@@ -1,18 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { observer } from 'mobx-react';
 import Header from '../../components/HeaderPaint';
 import Sidebar from '../../components/SidebarPaint';
 import socketService from '../../services/socket';
 import Cookies from 'js-cookie';
 import Whiteboard from '../../components/whiteboard/whiteboard';
-import { updateElement as updateElementInStore } from '../../components/whiteboard/whiteboardSlice';
-import { useDispatch } from 'react-redux';
+import store from '../../components/whiteboard/whiteboardStore';
 
-const Paint = () => {
-    const dispatch = useDispatch();
+const Paint = observer(() => {
     const { arteId, salaUUID } = useParams();
 
-    //TODO: fazer a reconexão
     useEffect(() => {
         const token = Cookies.get('user_token');
 
@@ -25,10 +23,8 @@ const Paint = () => {
         return () => {
             socketService.disconnect();
         };
-    }, [dispatch, salaUUID]);
+    }, [salaUUID]);
 
-    // Esse método conecta ao socket e se inscreve no tópico de alterações,
-    // atualizando o estado do Redux quando uma mensagem é recebida.
     const setupSocket = () => {
         if (salaUUID) {
             socketService.connect(() => {
@@ -46,10 +42,8 @@ const Paint = () => {
                         }
 
                         try {
-                            //console.log('Delta received:', message.delta);
-
-                            //atualiza o redux para desenhar os elementos recebidos
-                            dispatch(updateElementInStore(message.delta));
+                            console.log('Delta received:', message.delta);
+                            store.updateElement(message.delta);
                         } catch (error) {
                             console.error('Erro ao obter o delta:', error);
                         }
@@ -65,12 +59,11 @@ const Paint = () => {
 
     return (
         <div>
-            {/* <Header onUndo={handleUndo} onRedo={handleRedo} /> */}
             <Header />
             <Sidebar />
             <Whiteboard />
         </div>
     );
-};
+});
 
 export default Paint;
