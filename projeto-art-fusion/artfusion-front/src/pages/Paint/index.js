@@ -49,7 +49,7 @@ const Paint = () => {
                         const decoded = jwtDecode(token);
                         const usuario = JSON.parse(decoded.usuario);
 
-                        if (message.usuarioId == usuario.id) {
+                        if (message.usuarioId === usuario.id) {
                             return;
                         }
 

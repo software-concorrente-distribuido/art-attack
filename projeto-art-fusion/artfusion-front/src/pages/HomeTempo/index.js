@@ -48,8 +48,6 @@ const Button = styled.button`
     }
 `;
 
-//TODO: negócio de acessar pelo link
-
 const Home = () => {
     const [arteName, setArteName] = useState('');
     const [artes, setArtes] = useState([]);
@@ -104,7 +102,7 @@ const Home = () => {
         if (token) {
             try {
                 const salaUUID = await ApiServices.abrirSala(arteId, token);
-                navigate(`/paint/${arteId}/${salaUUID}`); // Redirecionar para a página de pintura
+                window.open(`/paint/${arteId}/${salaUUID}`, '_blank'); // Redirecionar para a página de pintura
             } catch (error) {
                 console.error('Erro ao abrir sala:', error);
             }

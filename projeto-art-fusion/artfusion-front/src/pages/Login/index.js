@@ -28,7 +28,7 @@ const Login = () => {
             return;
         }
 
-        navigate('/artes-recentes');
+        navigate('/home');
     };
 
     const isFormValid = email && password;

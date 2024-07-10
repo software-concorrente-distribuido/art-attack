@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 import sharesocialoutline from '../../assets/icons/share-social-outline.svg';
 import colorpaletteoutline from '../../assets/icons/color-palette-outline.svg';
 import brushoutline from '../../assets/icons/brush-outline.svg';
@@ -14,52 +14,54 @@ const ItenSideBar = styled.li`
     padding-right: 10px;
     padding-top: 20px;
     padding-bottom: 20px;
-    padding-left: 8px; 
+    padding-left: 8px;
     cursor: pointer;
     min-width: 224px;
-    font-weight: bold; 
+    font-weight: bold;
 
     &:hover {
-        background-color: #DEE0E5;
+        background-color: #dee0e5;
     }
-`
+`;
 
 const ItensSideBar = styled.ul`
     padding-top: 64px;
-`
+`;
 
 const ImagemIten = styled.img`
     margin-right: 8px;
-`
+`;
 
 function ItensSideBarHome() {
     return (
         <ItensSideBar>
-            <ItenSideBar> 
+            <ItenSideBar>
                 <LinkContainer>
-                    <Link to="/artesRecentes">
-                        <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes 
+                    <Link to="/artes-recentes">
+                        <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes
+                        Recentes
                     </Link>
-                </LinkContainer> 
+                </LinkContainer>
             </ItenSideBar>
 
-            <ItenSideBar> 
+            <ItenSideBar>
                 <LinkContainer>
-                    <Link to="/minhasArtes">
+                    <Link to="/minhas-artes">
                         <ImagemIten src={brushoutline}></ImagemIten>Minhas Artes
                     </Link>
-                </LinkContainer> 
+                </LinkContainer>
             </ItenSideBar>
 
-            <ItenSideBar> 
+            <ItenSideBar>
                 <LinkContainer>
-                    <Link to="/artesCompartilhadas">
-                        <ImagemIten src={sharesocialoutline}></ImagemIten>Compartilhadas Comigo 
+                    <Link to="/artes-compartilhadas">
+                        <ImagemIten src={sharesocialoutline}></ImagemIten>
+                        Compartilhadas Comigo
                     </Link>
-                </LinkContainer> 
+                </LinkContainer>
             </ItenSideBar>
         </ItensSideBar>
-    )
+    );
 }
 
-export default ItensSideBarHome
+export default ItensSideBarHome;
