@@ -35,31 +35,30 @@ const ImagemIten = styled.img`
 function ItensSideBarHome() {
     return (
         <ItensSideBar>
-            <ItenSideBar>
-                <LinkContainer>
-                    <Link to="/artes-recentes">
-                        <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes
-                        Recentes
-                    </Link>
-                </LinkContainer>
-            </ItenSideBar>
+            <LinkContainer>
+                <Link to="/artes-recentes">
+                    <ItenSideBar>
+                        <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes
+                    </ItenSideBar>
+                </Link>
+            </LinkContainer>
 
-            <ItenSideBar>
-                <LinkContainer>
-                    <Link to="/minhas-artes">
+            <LinkContainer>
+                <Link to="/minhas-artes">
+                    <ItenSideBar>
                         <ImagemIten src={brushoutline}></ImagemIten>Minhas Artes
-                    </Link>
-                </LinkContainer>
-            </ItenSideBar>
+                    </ItenSideBar>
+                </Link>
+            </LinkContainer>
 
-            <ItenSideBar>
-                <LinkContainer>
-                    <Link to="/artes-compartilhadas">
-                        <ImagemIten src={sharesocialoutline}></ImagemIten>
-                        Compartilhadas Comigo
-                    </Link>
-                </LinkContainer>
-            </ItenSideBar>
+
+            <LinkContainer>
+                <Link to="/artes-compartilhadas">
+                    <ItenSideBar>
+                        <ImagemIten src={sharesocialoutline}></ImagemIten>Compartilhadas Comigo
+                    </ItenSideBar>
+                </Link>
+            </LinkContainer>
         </ItensSideBar>
     );
 }
