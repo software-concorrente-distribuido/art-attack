@@ -4,6 +4,11 @@ import { store } from '../../../store/store';
 import { setElements } from '../whiteboardSlice';
 import socketService from '../../../services/socket';
 import { generateSprayPoints } from './generateSprayPoints';
+// import _ from 'lodash';
+
+// const sendThrottledUpdates = _.throttle((salaUUID, data) => {
+//     socketService.sendElementUpdate(salaUUID, data);
+// }, 250);
 
 const formatDrawingData = (element, arteId, usuarioId) => {
     return {
