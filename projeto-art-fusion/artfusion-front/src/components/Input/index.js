@@ -11,7 +11,7 @@ const Input = ({ type, placeholder, value, onChange }) => {
     const handleBlur = () => {
         setIsFocused(false);
     };
-   
+
     return (
         <C.Container>
             <C.Input
@@ -22,7 +22,7 @@ const Input = ({ type, placeholder, value, onChange }) => {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
             />
-            <C.Label isFocused={isFocused} hasValue={value}>
+            <C.Label $isFocused={isFocused} $hasValue={!!value}>
                 {placeholder}
             </C.Label>
         </C.Container>

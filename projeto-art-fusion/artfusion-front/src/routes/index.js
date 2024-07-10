@@ -30,11 +30,17 @@ const RoutesApp = () => {
                     <Route path="/login" element={<Login />} />
                     <Route exact path="/register" element={<Register />} />
 
-                    <Route exact path="/minhasArtes" element={<MyArts />} />
-                    <Route exact path="/artesCompartilhadas" element={<SharedArts />} />
-                    <Route exact path="/artesRecentes" element={<RecentArts />} />
-
-
+                    <Route exact path="/minhas-artes" element={<MyArts />} />
+                    <Route
+                        exact
+                        path="/artes-compartilhadas"
+                        element={<SharedArts />}
+                    />
+                    <Route
+                        exact
+                        path="/artes-recentes"
+                        element={<RecentArts />}
+                    />
 
                     <Route path="*" element={<Login />} />
                     <Route

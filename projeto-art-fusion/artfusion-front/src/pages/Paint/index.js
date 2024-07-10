@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 import Whiteboard from '../../components/whiteboard/whiteboard';
 import { updateElement as updateElementInStore } from '../../components/whiteboard/whiteboardSlice';
 import { useDispatch } from 'react-redux';
+import { jwtDecode } from 'jwt-decode';
 
 const Paint = () => {
     const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const Paint = () => {
         const token = Cookies.get('user_token');
 
         if (token) {
-            setupSocket();
+            setupSocket(token);
         } else {
             console.error('JWT token não encontrado.');
         }
@@ -29,7 +30,7 @@ const Paint = () => {
 
     // Esse método conecta ao socket e se inscreve no tópico de alterações,
     // atualizando o estado do Redux quando uma mensagem é recebida.
-    const setupSocket = () => {
+    const setupSocket = (token) => {
         if (salaUUID) {
             socketService.connect(() => {
                 console.log('Subscribing to /topic/alteracoes...', salaUUID);
@@ -42,6 +43,13 @@ const Paint = () => {
                             console.error(
                                 'Received a message without a delta.'
                             );
+                            return;
+                        }
+
+                        const decoded = jwtDecode(token);
+                        const usuario = JSON.parse(decoded.usuario);
+
+                        if (message.usuarioId == usuario.id) {
                             return;
                         }
 
