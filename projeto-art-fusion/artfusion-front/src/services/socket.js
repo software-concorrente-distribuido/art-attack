@@ -12,8 +12,11 @@ class SocketService {
         const token = Cookies.get('user_token');
 
         if (token) {
-            const socketUrl = new SockJS('http://localhost:8080/artsocket');
-            this.stompClient = Stomp.over(socketUrl);
+            const socketUrl = 'http://localhost:8080/artsocket';
+
+            this.stompClient = Stomp.over(() => new SockJS(socketUrl));
+
+            this.stompClient.reconnect_delay = 5000;
 
             this.stompClient.connect(
                 { 'X-Authorization': `Bearer ${token}` },

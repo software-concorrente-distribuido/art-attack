@@ -1,4 +1,4 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 import sharesocialoutline from '../../assets/icons/share-social-outline.svg';
 import colorpaletteoutline from '../../assets/icons/color-palette-outline.svg';
 import brushoutline from '../../assets/icons/brush-outline.svg';
@@ -14,23 +14,23 @@ const ItenSideBar = styled.li`
     padding-right: 10px;
     padding-top: 20px;
     padding-bottom: 20px;
-    padding-left: 8px; 
+    padding-left: 8px;
     cursor: pointer;
     min-width: 224px;
-    font-weight: bold; 
+    font-weight: bold;
 
     &:hover {
-        background-color: #DEE0E5;
+        background-color: #dee0e5;
     }
-`
+`;
 
 const ItensSideBar = styled.ul`
     padding-top: 64px;
-`
+`;
 
 const ImagemIten = styled.img`
     margin-right: 8px;
-`
+`;
 
 function ItensSideBarHome() {
     return (
@@ -60,7 +60,7 @@ function ItensSideBarHome() {
                 </Link>
             </LinkContainer>
         </ItensSideBar>
-    )
+    );
 }
 
-export default ItensSideBarHome
+export default ItensSideBarHome;
