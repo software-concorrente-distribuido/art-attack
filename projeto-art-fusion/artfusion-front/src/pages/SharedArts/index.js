@@ -29,7 +29,6 @@ const MyArts = () => {
                         <Button width={"15%"} Text={"+     Nova Arte"}></Button>
                     </ContainerTitleButton>
 
-                    <TopBar></TopBar>
                     <Card></Card>
 
                 </ContainerArtesRecentes>

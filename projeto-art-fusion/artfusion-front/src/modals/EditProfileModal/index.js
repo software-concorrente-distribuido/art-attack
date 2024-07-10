@@ -67,6 +67,7 @@ function EditProfileModal({ onClose }) {
         </PasswordContainer>
 
         <Button width={"15%"} Text="Salvar" />
+
       </EditProfileModalContainer>
     </ModalOverlayContainer>
   );

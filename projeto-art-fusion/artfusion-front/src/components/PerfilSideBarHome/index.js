@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import user from '../../assets/images/man16_117721.svg';
-import EditProfileModal from '../../modals/EditProfileModal'; // Este é o componente que atualizamos
-import EnableEditProfileModal from '../../modals/EnableEditProfileModal'; // Certifique-se de que este caminho esteja correto
+import EditProfileModal from '../../modals/EditProfileModal'; 
+import EnableEditProfileModal from '../../modals/EnableEditProfileModal'; 
 
 const PageContainer = styled.div`
     display: flex;

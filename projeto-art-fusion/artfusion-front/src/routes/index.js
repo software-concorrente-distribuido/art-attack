@@ -10,6 +10,7 @@ import SharedArts from '../pages/SharedArts';
 import MyArts from '../pages/MyArts';
 import RecentArts from '../pages/RecentArts';
 import EditProfileModal from '../modals/EditProfileModal';
+import ShareModal from '../modals/ShareModal';
 
 const Private = ({ Item }) => {
     const { signed } = useAuth();
@@ -47,6 +48,12 @@ const RoutesApp = () => {
                         exact
                         path="/perfil"
                         element={<EditProfileModal />}
+                    />
+
+                    <Route
+                        exact
+                        path="/ShareModal"
+                        element={<ShareModal />}
                     />
 
                     <Route path="*" element={<Login />} />

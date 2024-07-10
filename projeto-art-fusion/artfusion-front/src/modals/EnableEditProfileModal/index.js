@@ -60,11 +60,12 @@ function EnableEditProfileModal({ onClose }) {
         <Label>E-mail:</Label>
           <LabelDados>joaodasilva@email.com</LabelDados>
 
-        <Button width={"15%"} Text="Editar" onClick={openEditProfileModal} />
+        <Button width={"15%"} Text="Editar" onClick={openEditProfileModal}/>
 
         {isEditProfileOpen && (
           <EditProfileModal onClose={closeEditProfileModal} /> 
         )}
+        
       </EditProfileModalContainer>
     </ModalOverlayContainer>
   );

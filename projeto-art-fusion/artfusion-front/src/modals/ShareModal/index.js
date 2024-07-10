@@ -31,6 +31,12 @@ function ShareModal() {
 
         <Title size="20px" align="left"> Pessoas com acesso </Title>
 
+        <ul>
+          <li>
+            
+          </li>
+        </ul>
+
 
 
         <Title size="20px" align="left"> Acesso geral </Title>
