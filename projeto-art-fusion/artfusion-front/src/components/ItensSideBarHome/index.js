@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import sharesocialoutline from '../../assets/icons/share-social-outline.svg';
 import colorpaletteoutline from '../../assets/icons/color-palette-outline.svg';
 import brushoutline from '../../assets/icons/brush-outline.svg';
+import { Link, useNavigate } from 'react-router-dom';
+import LinkContainer from '../Containers/LinkContainer';
 
 const ItenSideBar = styled.li`
     font-size: 16px;
@@ -28,15 +30,34 @@ const ItensSideBar = styled.ul`
 
 const ImagemIten = styled.img`
     margin-right: 8px;
-    
 `
 
 function ItensSideBarHome() {
     return (
         <ItensSideBar>
-            <ItenSideBar> <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes</ItenSideBar>
-            <ItenSideBar> <ImagemIten src={brushoutline}></ImagemIten>Minhas Artes</ItenSideBar>
-            <ItenSideBar> <ImagemIten src={sharesocialoutline}></ImagemIten> Compartilhadas Comigo</ItenSideBar>
+            <ItenSideBar> 
+                <LinkContainer>
+                    <Link to="/artesRecentes">
+                        <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes 
+                    </Link>
+                </LinkContainer> 
+            </ItenSideBar>
+
+            <ItenSideBar> 
+                <LinkContainer>
+                    <Link to="/minhasArtes">
+                        <ImagemIten src={brushoutline}></ImagemIten>Minhas Artes
+                    </Link>
+                </LinkContainer> 
+            </ItenSideBar>
+
+            <ItenSideBar> 
+                <LinkContainer>
+                    <Link to="/artesCompartilhadas">
+                        <ImagemIten src={sharesocialoutline}></ImagemIten>Compartilhadas Comigo 
+                    </Link>
+                </LinkContainer> 
+            </ItenSideBar>
         </ItensSideBar>
     )
 }

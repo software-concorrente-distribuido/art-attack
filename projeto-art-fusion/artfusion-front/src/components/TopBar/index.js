@@ -10,6 +10,7 @@ const Opcao = styled.li`
     height: 100%;
     margin-top: 20px;
     margin-right: 20px;
+    font-weight: bold;
 
     padding: 5px;
     cursor: pointer;
@@ -26,9 +27,8 @@ const Opcao = styled.li`
 
 const Opcoes = styled.ul`
     display: flex;
-    border-bottom: #21272A 2px solid; 
+    border-bottom: 1px solid rgba(221, 225, 230);
     margin: 20px;
-    background-color: yellow; 
 `
 
 

@@ -18,8 +18,6 @@ const SideBarContainer = styled.div`
     align-items: flex-start; 
     background-color: #FFFFFF; 
     padding-left: 16px; 
-
-    border: 2px red solid;
 `
 
 const SideBar = () => {

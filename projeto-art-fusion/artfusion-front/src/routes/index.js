@@ -6,6 +6,9 @@ import Login from '../pages/Login';
 import useAuth from '../hooks/useAuth';
 import Paint from '../pages/Paint';
 import HomeTempo from '../pages/HomeTempo';
+import SharedArts from '../pages/SharedArts';
+import MyArts from '../pages/MyArts';
+import RecentArts from '../pages/RecentArts';
 
 const Private = ({ Item }) => {
     const { signed } = useAuth();
@@ -21,11 +24,18 @@ const RoutesApp = () => {
                     <Route
                         exact
                         path="/home"
-                        //element={<HomeTempo />} // deixar a rota home livre para implementação
-                        element={<Private Item={HomeTempo} />}
+                        element={<HomeTempo />} // deixar a rota home livre para implementação
+                        // element={<Private Item={HomeTempo} />}
                     />
                     <Route path="/login" element={<Login />} />
                     <Route exact path="/register" element={<Register />} />
+
+                    <Route exact path="/minhasArtes" element={<MyArts />} />
+                    <Route exact path="/artesCompartilhadas" element={<SharedArts />} />
+                    <Route exact path="/artesRecentes" element={<RecentArts />} />
+
+
+
                     <Route path="*" element={<Login />} />
                     <Route
                         path="/paint/:arteId/:salaUUID"
