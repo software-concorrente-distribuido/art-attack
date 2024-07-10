@@ -9,6 +9,7 @@ import HomeTempo from '../pages/HomeTempo';
 import SharedArts from '../pages/SharedArts';
 import MyArts from '../pages/MyArts';
 import RecentArts from '../pages/RecentArts';
+import EditProfileModal from '../modals/EditProfileModal';
 
 const Private = ({ Item }) => {
     const { signed } = useAuth();
@@ -40,6 +41,12 @@ const RoutesApp = () => {
                         exact
                         path="/artes-recentes"
                         element={<RecentArts />}
+                    />
+
+                    <Route
+                        exact
+                        path="/perfil"
+                        element={<EditProfileModal />}
                     />
 
                     <Route path="*" element={<Login />} />
