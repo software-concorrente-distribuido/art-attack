@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { toolTypes, actions } from '../../constants';
 import { clearElements } from './whiteboardSlice';
+import { jwtDecode } from 'jwt-decode';
 import {
     createElement,
     updateElement,
@@ -13,6 +14,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { updateElement as updateElementInStore } from './whiteboardSlice';
 import { useUserId } from '../../hooks/useUserId';
+import { flushBuffer } from './utils/updateElement';
 
 let selectedElement;
 
@@ -103,6 +105,28 @@ const Whiteboard = () => {
             setSelectedElement(element);
 
             dispatch(updateElementInStore(element));
+
+            const index = elements.length;
+            const updatedElements = [...elements, element];
+
+            // Adicionar ponto inicial ao buffer
+            updateElement(
+                {
+                    id: element.id,
+                    x1: clientX,
+                    x2: clientX,
+                    y1: clientY,
+                    y2: clientY,
+                    type: toolType,
+                    index: index,
+                    color: element.color,
+                    lineWidth: element.lineWidth,
+                },
+                updatedElements,
+                userId,
+                arteId,
+                salaUUID
+            );
         }
     };
 
@@ -137,6 +161,8 @@ const Whiteboard = () => {
                     salaUUID
                 );
             }
+
+            flushBuffer(salaUUID, arteId, userId, true);
         }
 
         setAction(null);

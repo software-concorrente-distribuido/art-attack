@@ -24,7 +24,7 @@ const whiteboardSlice = createSlice({
             state.color = action.payload;
         },
         updateElement: (state, action) => {
-            const { id, points } = action.payload;
+            const { id, points, type } = action.payload;
 
             const index = state.elements.findIndex(
                 (element) => element.id === id
@@ -33,11 +33,12 @@ const whiteboardSlice = createSlice({
             if (index === -1) {
                 state.elements.push(action.payload);
             } else {
-                state.elements[index].points = [
-                    ...state.elements[index].points,
-                    ...points,
-                ];
-                // state.elements[index] = action.payload;
+                if (type === 'PENCIL') {
+                    state.elements[index].points = [
+                        ...state.elements[index].points,
+                        ...points,
+                    ];
+                } else state.elements[index] = action.payload;
             }
         },
         setElements: (state, action) => {
