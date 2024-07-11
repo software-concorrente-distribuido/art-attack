@@ -37,7 +37,7 @@ const Paint = () => {
                 socketService.subscribe(
                     `/topic/alteracoes/${salaUUID}`,
                     (message) => {
-                        console.log('Raw message received:', message);
+                        //console.log('Raw message received:', message);
 
                         if (!message || !message.delta) {
                             console.error(
@@ -49,13 +49,11 @@ const Paint = () => {
                         const decoded = jwtDecode(token);
                         const usuario = JSON.parse(decoded.usuario);
 
-                        if (message.usuarioId === usuario.id) {
+                        if (message.usuarioId == usuario.id) {
                             return;
                         }
 
                         try {
-                            //console.log('Delta received:', message.delta);
-
                             //atualiza o redux para desenhar os elementos recebidos
                             dispatch(updateElementInStore(message.delta));
                         } catch (error) {

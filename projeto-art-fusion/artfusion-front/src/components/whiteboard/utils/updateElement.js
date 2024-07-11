@@ -4,11 +4,11 @@ import { store } from '../../../store/store';
 import { setElements } from '../whiteboardSlice';
 import socketService from '../../../services/socket';
 import { generateSprayPoints } from './generateSprayPoints';
-// import _ from 'lodash';
+import _ from 'lodash';
 
-// const sendThrottledUpdates = _.throttle((salaUUID, data) => {
-//     socketService.sendElementUpdate(salaUUID, data);
-// }, 250);
+const throttledSendUpdates = _.throttle((salaUUID, data) => {
+    socketService.sendElementUpdate(salaUUID, data);
+}, 100);
 
 const formatDrawingData = (element, arteId, usuarioId) => {
     return {
@@ -81,6 +81,7 @@ export const updateElement = (
                 );
                 break;
             case toolTypes.PENCIL:
+                const newPoint = { x: x2, y: y2 };
                 elementsCopy[index] = {
                     ...elementsCopy[index],
                     points: [
@@ -96,9 +97,34 @@ export const updateElement = (
 
                 store.dispatch(setElements(elementsCopy));
 
+                // throttledSendUpdates(
+                //     salaUUID,
+                //     formatDrawingData(
+                //         {
+                //             id: updatedPencilElement.id,
+                //             type: updatedPencilElement.type,
+                //             points: [newPoint],
+                //             lineWidth: updatedPencilElement.lineWidth,
+                //             color: updatedPencilElement.color,
+                //         },
+                //         arteId,
+                //         userId
+                //     )
+                // );
+
                 socketService.sendElementUpdate(
                     salaUUID,
-                    formatDrawingData(updatedPencilElement, arteId, userId)
+                    formatDrawingData(
+                        {
+                            id: updatedPencilElement.id,
+                            type: updatedPencilElement.type,
+                            points: [newPoint],
+                            lineWidth: updatedPencilElement.lineWidth,
+                            color: updatedPencilElement.color,
+                        },
+                        arteId,
+                        userId
+                    )
                 );
                 break;
             case toolTypes.SPRAY:
