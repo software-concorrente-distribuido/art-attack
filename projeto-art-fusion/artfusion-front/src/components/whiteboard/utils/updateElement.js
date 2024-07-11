@@ -4,11 +4,8 @@ import { store } from '../../../store/store';
 import { setElements } from '../whiteboardSlice';
 import socketService from '../../../services/socket';
 import { generateSprayPoints } from './generateSprayPoints';
-// import _ from 'lodash';
-
-// const sendThrottledUpdates = _.throttle((salaUUID, data) => {
-//     socketService.sendElementUpdate(salaUUID, data);
-// }, 250);
+import { updateElement as updateElementInStore } from '../whiteboardSlice';
+import _ from 'lodash';
 
 const formatDrawingData = (element, arteId, usuarioId) => {
     return {
@@ -18,8 +15,38 @@ const formatDrawingData = (element, arteId, usuarioId) => {
     };
 };
 
+const buffer = {};
+const BUFFER_LIMIT = 10;
+
+export const flushBuffer = (salaUUID, arteId, userId, forceFlush = false) => {
+    Object.keys(buffer).forEach((id) => {
+        if (
+            buffer[id].points.length > 0 &&
+            (buffer[id].points.length >= BUFFER_LIMIT || forceFlush)
+        ) {
+            const pointsToSend = buffer[id].points.splice(0, BUFFER_LIMIT);
+            const element = {
+                id,
+                points: pointsToSend,
+                type: buffer[id].type,
+                lineWidth: buffer[id].lineWidth,
+                color: buffer[id].color,
+            };
+
+            socketService.sendElementUpdate(
+                salaUUID,
+                formatDrawingData(element, arteId, userId)
+            );
+
+            if (buffer[id].points.length === 0) {
+                delete buffer[id];
+            }
+        }
+    });
+};
+
 export const updateElement = (
-    { id, x1, x2, y1, y2, type, index, lineWidth },
+    { id, x1, x2, y1, y2, type, index, lineWidth, color },
     elements,
     userId,
     arteId,
@@ -29,6 +56,30 @@ export const updateElement = (
 
     try {
         switch (type) {
+            case toolTypes.ERASER:
+            case toolTypes.PENCIL:
+                const newPoint = { x: x2, y: y2 };
+                if (!buffer[id]) {
+                    buffer[id] = { points: [], lineWidth, color, type };
+                }
+                buffer[id].points.push(newPoint);
+
+                if (buffer[id].points.length >= BUFFER_LIMIT) {
+                    flushBuffer(salaUUID, arteId, userId);
+                }
+
+                elementsCopy[index] = {
+                    ...elementsCopy[index],
+                    points: [
+                        ...elementsCopy[index].points,
+                        {
+                            x: x2,
+                            y: y2,
+                        },
+                    ],
+                };
+                store.dispatch(setElements(elementsCopy));
+                break;
             case toolTypes.CIRCLE:
                 // Calcular o raio com base nos novos x2 e y2
                 const dx = x2 - x1;
@@ -80,27 +131,6 @@ export const updateElement = (
                     formatDrawingData(updatedElement, arteId, userId)
                 );
                 break;
-            case toolTypes.PENCIL:
-                elementsCopy[index] = {
-                    ...elementsCopy[index],
-                    points: [
-                        ...elementsCopy[index].points,
-                        {
-                            x: x2,
-                            y: y2,
-                        },
-                    ],
-                };
-
-                const updatedPencilElement = elementsCopy[index];
-
-                store.dispatch(setElements(elementsCopy));
-
-                socketService.sendElementUpdate(
-                    salaUUID,
-                    formatDrawingData(updatedPencilElement, arteId, userId)
-                );
-                break;
             case toolTypes.SPRAY:
                 const newSprayPoints = generateSprayPoints(x2, y2, lineWidth);
                 elementsCopy[index] = {
@@ -127,24 +157,6 @@ export const updateElement = (
                     formatDrawingData(updatedSprayElement, 1, userId)
                 );
                 break;
-            case toolTypes.ERASER:
-                elementsCopy[index] = {
-                    ...elementsCopy[index],
-                    points: [
-                        ...elementsCopy[index].points,
-                        {
-                            x: x2,
-                            y: y2,
-                        },
-                    ],
-                };
-                const updatedEraserElement = elementsCopy[index];
-                store.dispatch(setElements(elementsCopy));
-                socketService.sendElementUpdate(
-                    salaUUID,
-                    formatDrawingData(updatedEraserElement, arteId, userId)
-                );
-                break;
             default:
                 throw new Error('Algo deu errado ao atualizar o elemento');
         }
@@ -152,4 +164,8 @@ export const updateElement = (
         console.error(error);
         return null;
     }
+};
+
+export const flushAllBuffers = (salaUUID, arteId, userId) => {
+    flushBuffer(salaUUID, arteId, userId, true);
 };
