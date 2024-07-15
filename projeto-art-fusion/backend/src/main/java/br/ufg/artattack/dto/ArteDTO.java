@@ -1,6 +1,7 @@
 package br.ufg.artattack.dto;
 
 import br.ufg.artattack.modelo.Arte;
+import br.ufg.artattack.modelo.Snapshot;
 
 import java.util.Date;
 
@@ -13,6 +14,7 @@ public class ArteDTO {
 
     public UsuarioDTO administrador;
 
+    public Snapshot snapshot;
 
     public Date dataCriacao;
 

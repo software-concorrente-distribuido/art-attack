@@ -10,15 +10,16 @@ import br.ufg.artattack.servico.SalaServico;
 import br.ufg.artattack.servico.UsuarioServico;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.security.Principal;
 import java.util.List;
+import java.util.Objects;
 
 
 @Controller
@@ -36,34 +37,54 @@ public class SocketController {
     @Autowired
     private UsuarioServico usuarioServico;
 
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+
     @MessageMapping("/alteracoes/{uuid}")
-    public void propagar(@Payload Message<AlteracaoEntradaDTO> msg, @DestinationVariable String uuid)  {
-        AlteracaoEntradaDTO alteracaoEntradaDTO = msg.getPayload();
+    public void propagar(@Payload Message<AlteracaoEntradaDTO> msg, @DestinationVariable String uuid, Principal principal)  {
 
-        AlteracaoSaidaDTO alteracaoDTO;
 
-        Sala sala = salaServico.obterSala(uuid);
+
+        try {
+            AlteracaoEntradaDTO alteracaoEntradaDTO = msg.getPayload();
+
+            Sala sala = salaServico.obterSala(uuid);
+
+            verificarPermissoesSala(alteracaoEntradaDTO, sala);
+
+            AlteracaoSaidaDTO alteracaoDTO = alteracaoServico.salvarPayloadAlteracao(alteracaoEntradaDTO);
+
+            simpMessagingTemplate.convertAndSend("/topic/alteracoes/"+ uuid,alteracaoDTO.toJsonString());
+
+            org.springframework.amqp.core.Message message = new org.springframework.amqp.core.Message(alteracaoDTO.toJsonString().getBytes());
+
+            rabbitTemplate.convertAndSend("alteracoes.geral",alteracaoDTO);
+
+
+        } catch (Exception e) {
+            simpMessagingTemplate.convertAndSend("/topic/alteracoes/" + uuid,new ExcecaoDTO(e).stringfy());
+
+        }
+
+
+    }
+
+    private void verificarPermissoesSala(AlteracaoEntradaDTO alteracaoEntradaDTO, Sala sala) throws IllegalArgumentException {
 
         if(sala==null){
-            return;
+            throw new IllegalArgumentException("Sala não encontrada!");
+        }
+        if( !Objects.equals(sala.arte.id, alteracaoEntradaDTO.arteId)){
+            throw new IllegalArgumentException("Requisição de alteração inválida! ID da arte da sala não bate com ID da arte de alteração");
         }
 
         List<TipoPermissao> permissoes=  sala.obterPermissoesDoUsuario(usuarioServico.getUsuarioLogadoId());
 
         if(permissoes==null || !permissoes.contains(TipoPermissao.EDITAR)){
-            return;
+            throw new IllegalArgumentException("Usuário sem permissão necessária para alterações!");
         }
-
-
-        try {
-            alteracaoDTO = alteracaoServico.salvarPayloadAlteracao(alteracaoEntradaDTO);
-            simpMessagingTemplate.convertAndSend("/topic/alteracoes/"+ uuid,alteracaoDTO.toJsonString());
-
-        } catch (Exception e) {
-            simpMessagingTemplate.convertAndSend("/topic/alteracoes/" + uuid,"{}");
-
-        }
-
 
     }
 

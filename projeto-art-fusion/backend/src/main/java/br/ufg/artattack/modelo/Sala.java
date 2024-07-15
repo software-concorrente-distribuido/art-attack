@@ -1,22 +1,15 @@
 package br.ufg.artattack.modelo;
 
+import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.dto.ArteDTO;
+import br.ufg.artattack.dto.IntegranteDTO;
 import br.ufg.artattack.dto.UsuarioDTO;
 
 import java.util.*;
 
 public class Sala {
 
-    private class Integrante{
-        UsuarioDTO colaborador;
-        List<TipoPermissao> permissoes;
 
-        public Integrante(UsuarioDTO colaborador, List<TipoPermissao> permissoes) {
-            this.colaborador = colaborador;
-            this.permissoes = permissoes;
-
-        }
-    }
 
     public String titulo;
     public  String uuid;
@@ -49,14 +42,17 @@ public class Sala {
     public void addIntegrante(UsuarioDTO usuarioDTO, List<TipoPermissao> permissoes){
 
         for (int i = 0; i < this.integrantes.size(); i++) {
+
             Integrante integrante = this.integrantes.get(i);
+
+            //integrante já está lá
             if (integrante.colaborador.id.equals(usuarioDTO.getId())) {
-                this.integrantes.set(i, new Integrante(usuarioDTO, permissoes));
+                this.integrantes.set(i, new Integrante(usuarioDTO, permissoes,integrante.mensagensBuffer));
+
                 return;
             }
+
         }
-
-
 
         this.integrantes.add(new Integrante(usuarioDTO,permissoes));
     }
@@ -70,5 +66,23 @@ public class Sala {
         return null;
 
     }
+
+    //usado pelo ObjectMapper
+    public List<IntegranteDTO> getIntegrantes() {
+        return integrantes.stream().map(IntegranteDTO::new).toList();
+    }
+
+    public void colocarNoBufferDoIntegrante(Long usuarioId, String alteracao){
+
+        Integrante integrante = getIntegrante(usuarioId);
+
+        integrante.mensagensBuffer.add(alteracao);
+
+    }
+
+    public Integrante getIntegrante(Long usuarioId){
+        return integrantes.stream().filter(i->i.colaborador.id.equals(usuarioId.toString())).toList().get(0);
+    }
+
 
 }

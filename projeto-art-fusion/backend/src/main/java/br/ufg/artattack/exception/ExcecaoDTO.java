@@ -1,5 +1,7 @@
 package br.ufg.artattack.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,5 +26,13 @@ public class ExcecaoDTO {
         this.mensagem = mensagem;
         this.causa = causa;
         this.erro = true;
+    }
+    public String stringfy(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            return  objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            return "{}";
+        }
     }
 }

@@ -13,4 +13,8 @@ public class Snapshot extends EntidadeJPA{
     @ManyToOne
     Arte arte;
 
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }
