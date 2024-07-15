@@ -37,7 +37,6 @@ const TopBar = () => {
         <Opcoes>
             <Opcao>Abertas à contribuição</Opcao>
             <Opcao>Abertas à visualização</Opcao>
-            <Opcao>Apenas minhas</Opcao>
         </Opcoes>
     );
 };

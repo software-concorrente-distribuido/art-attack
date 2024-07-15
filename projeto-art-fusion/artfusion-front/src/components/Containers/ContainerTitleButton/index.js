@@ -5,7 +5,6 @@ const ContainerTitleButton = styled.div`
     flex-direction: row;
     width: 100%;
     padding: 20px;
-    
 `
 
 export default ContainerTitleButton

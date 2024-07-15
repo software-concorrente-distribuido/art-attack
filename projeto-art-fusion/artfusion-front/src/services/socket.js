@@ -15,8 +15,7 @@ class SocketService {
             const socketUrl = 'http://localhost:8080/artsocket';
 
             this.stompClient = Stomp.over(() => new SockJS(socketUrl));
-
-            this.stompClient.reconnect_delay = 5000;
+            this.stompClient.reconnect_delay = 50;
 
             this.stompClient.connect(
                 { 'X-Authorization': `Bearer ${token}` },
@@ -27,6 +26,10 @@ class SocketService {
                 },
                 (error) => {
                     console.error('Connection error: ', error);
+                    setTimeout(
+                        () => this.connect(callback),
+                        this.stompClient.reconnect_delay
+                    );
                 }
             );
         } else {
@@ -45,16 +48,28 @@ class SocketService {
     }
 
     sendElementUpdate(salaUUID, elementData) {
-        console.debug('****** SALA UUID ******', salaUUID);
-        console.debug('ELEMENT DATA', elementData);
         if (this.stompClient && this.connected) {
-            this.stompClient.send(
-                `/envio/alteracoes/${salaUUID}`,
-                {},
-                JSON.stringify(elementData)
-            );
+            console.log('Enviado:', elementData.delta);
+
+            try {
+                this.stompClient.send(
+                    `/envio/alteracoes/${salaUUID}`,
+                    {},
+                    JSON.stringify(elementData)
+                );
+            } catch (error) {
+                console.error('Falha ao enviar:', error);
+            }
         } else {
-            console.error('Socket is not connected');
+            console.error('Socket não está conectado, mensagem não enviada.');
+            // Tentativa de reconexão
+            this.connect(() => {
+                this.stompClient.send(
+                    `/envio/alteracoes/${salaUUID}`,
+                    {},
+                    JSON.stringify(elementData)
+                );
+            });
         }
     }
 
