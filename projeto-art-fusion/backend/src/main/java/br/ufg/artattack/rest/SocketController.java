@@ -1,5 +1,6 @@
 package br.ufg.artattack.rest;
 
+import br.ufg.artattack.amqp.ServicoRabbitMQ;
 import br.ufg.artattack.dto.AlteracaoEntradaDTO;
 import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.exception.ExcecaoDTO;
@@ -42,10 +43,12 @@ public class SocketController {
     private RabbitTemplate rabbitTemplate;
 
 
+    @Autowired
+    ServicoRabbitMQ servicoRabbitMQ;
+
+
     @MessageMapping("/alteracoes/{uuid}")
     public void propagar(@Payload Message<AlteracaoEntradaDTO> msg, @DestinationVariable String uuid, Principal principal)  {
-
-
 
         try {
             AlteracaoEntradaDTO alteracaoEntradaDTO = msg.getPayload();
@@ -60,7 +63,7 @@ public class SocketController {
 
             org.springframework.amqp.core.Message message = new org.springframework.amqp.core.Message(alteracaoDTO.toJsonString().getBytes());
 
-            rabbitTemplate.convertAndSend("alteracoes.geral",alteracaoDTO);
+            rabbitTemplate.convertAndSend("teste.test","",alteracaoDTO);
 
 
         } catch (Exception e) {
@@ -68,8 +71,8 @@ public class SocketController {
 
         }
 
-
     }
+
 
     private void verificarPermissoesSala(AlteracaoEntradaDTO alteracaoEntradaDTO, Sala sala) throws IllegalArgumentException {
 

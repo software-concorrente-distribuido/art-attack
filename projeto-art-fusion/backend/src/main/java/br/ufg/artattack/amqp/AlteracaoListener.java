@@ -11,8 +11,9 @@ import org.springframework.stereotype.Component;
 public class AlteracaoListener {
 
 
-    @RabbitListener(queues = "alteracoes.geral")
+    @RabbitListener(queues = "fila.teste")
     public void recebeMensagem(AlteracaoSaidaDTO msg){
+
         System.out.println(msg);
     }
 
