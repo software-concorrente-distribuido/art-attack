@@ -12,17 +12,10 @@ public class Integrante{
 
     public List<TipoPermissao> permissoes;
 
-    public CopyOnWriteArrayList<String> mensagensBuffer;
 
     public Integrante(UsuarioDTO colaborador, List<TipoPermissao> permissoes) {
         this.colaborador = colaborador;
         this.permissoes = permissoes;
-        this.mensagensBuffer = new CopyOnWriteArrayList<>();
     }
 
-    public Integrante(UsuarioDTO colaborador, List<TipoPermissao> permissoes, CopyOnWriteArrayList<String> mensagensBuffer) {
-        this.colaborador = colaborador;
-        this.permissoes = permissoes;
-        this.mensagensBuffer = mensagensBuffer;
-    }
 }

@@ -17,5 +17,5 @@ public interface ArteRepositorio extends JpaRepository<Arte,Long> {
 
     Boolean existsByIdAndVisibilidade(Long id, Visibilidade visibilidade);
 
-
+    boolean existsByTituloAndAdministradorId(String titulo, Long id);
 }

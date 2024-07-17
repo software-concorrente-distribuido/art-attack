@@ -1,5 +1,6 @@
 package br.ufg.artattack.rest;
 
+import br.ufg.artattack.amqp.RabbitMQConfig;
 import br.ufg.artattack.amqp.ServicoRabbitMQ;
 import br.ufg.artattack.dto.AlteracaoEntradaDTO;
 import br.ufg.artattack.dto.AlteracaoSaidaDTO;
@@ -57,17 +58,17 @@ public class SocketController {
 
             verificarPermissoesSala(alteracaoEntradaDTO, sala);
 
-            AlteracaoSaidaDTO alteracaoDTO = alteracaoServico.salvarPayloadAlteracao(alteracaoEntradaDTO);
+            AlteracaoSaidaDTO alteracaoSaidaDTO = alteracaoServico.gerarPayloadAlteracaoSaida(alteracaoEntradaDTO);
 
-            simpMessagingTemplate.convertAndSend("/topic/alteracoes/"+ uuid,alteracaoDTO.toJsonString());
+            String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(alteracaoSaidaDTO.arteId);
 
-            org.springframework.amqp.core.Message message = new org.springframework.amqp.core.Message(alteracaoDTO.toJsonString().getBytes());
-
-            rabbitTemplate.convertAndSend("teste.test","",alteracaoDTO);
-
+            rabbitTemplate.convertAndSend(RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey,alteracaoSaidaDTO);
 
         } catch (Exception e) {
-            simpMessagingTemplate.convertAndSend("/topic/alteracoes/" + uuid,new ExcecaoDTO(e).stringfy());
+
+            String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(msg.getPayload().arteId);
+
+            rabbitTemplate.convertAndSend(RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey,new ExcecaoDTO(e).stringfy());
 
         }
 
