@@ -5,7 +5,8 @@ import br.ufg.artattack.modelo.Sala;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class SalaAbertaDTO {
+public class SalaAbertaWrapper {
     public Sala salaNova;
-    public Integrante integranteNovo;
+    public Integrante integranteRequerinte;
+    public boolean isIntegranteNovo;
 }

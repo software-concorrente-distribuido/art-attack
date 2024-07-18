@@ -1,7 +1,6 @@
 package br.ufg.artattack.amqp;
 
-import br.ufg.artattack.dto.SalaAbertaDTO;
-import com.rabbitmq.client.ConnectionFactory;
+import br.ufg.artattack.dto.SalaAbertaWrapper;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -43,8 +42,8 @@ public class ServicoRabbitMQ {
 
     }
 
-    public static String getEspecificoBindingKey(SalaAbertaDTO salaAbertaDTO){
-        return getEspecificoBindingKey(salaAbertaDTO.salaNova.arte.id,salaAbertaDTO.integranteNovo.colaborador.id);
+    public static String getEspecificoBindingKey(SalaAbertaWrapper salaAbertaWrapper){
+        return getEspecificoBindingKey(salaAbertaWrapper.salaNova.arte.id, salaAbertaWrapper.integranteRequerinte.colaborador.id);
     }
 
 

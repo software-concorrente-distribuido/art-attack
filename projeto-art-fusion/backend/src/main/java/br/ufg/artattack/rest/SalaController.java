@@ -2,9 +2,10 @@ package br.ufg.artattack.rest;
 
 import br.ufg.artattack.amqp.RabbitMQConfig;
 import br.ufg.artattack.amqp.ServicoRabbitMQ;
+import br.ufg.artattack.amqp.UsuarioSalaSocketEnviador;
 import br.ufg.artattack.dto.AbrirSalaDTO;
 import br.ufg.artattack.dto.AlteracaoSaidaDTO;
-import br.ufg.artattack.dto.SalaAbertaDTO;
+import br.ufg.artattack.dto.SalaAbertaWrapper;
 import br.ufg.artattack.modelo.Sala;
 import br.ufg.artattack.servico.ArteServico;
 import br.ufg.artattack.servico.SalaServico;
@@ -39,13 +40,13 @@ public class SalaController {
     @PostMapping("/abrir")
     public ResponseEntity<Sala> abrirSala(@RequestBody AbrirSalaDTO abrirSalaDTO) throws Exception {
 
-        SalaAbertaDTO salaAbertaDTO = salaServico.abrirSala(abrirSalaDTO.arteId);
+        SalaAbertaWrapper salaAbertaWrapper = salaServico.abrirSala(abrirSalaDTO.arteId);
 
-        String queueName = salaAbertaDTO.salaNova.uuid+"."+salaAbertaDTO.integranteNovo.colaborador.id;
+        String queueName = salaAbertaWrapper.salaNova.uuid+"."+ salaAbertaWrapper.integranteRequerinte.colaborador.id;
 
-        String especificoBindingKey = ServicoRabbitMQ.getEspecificoBindingKey(salaAbertaDTO);
+        String especificoBindingKey = ServicoRabbitMQ.getEspecificoBindingKey(salaAbertaWrapper);
 
-        String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(salaAbertaDTO.salaNova.arte.id);
+        String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(salaAbertaWrapper.salaNova.arte.id);
 
         servicoRabbitMQ.createNonDurableQueue(queueName);
 
@@ -53,25 +54,9 @@ public class SalaController {
 
         servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey);
 
-        servicoRabbitMQ.createConsumer(queueName, new MessageListenerAdapter(new Object(){
+        servicoRabbitMQ.createConsumer(queueName, new MessageListenerAdapter(new UsuarioSalaSocketEnviador(salaAbertaWrapper,simpMessagingTemplate)));
 
-            public void handleMessage(AlteracaoSaidaDTO alteracaoSaidaDTO){
-                String urlDestination = "/topic/alteracoes/"+ salaAbertaDTO.salaNova.uuid + "/"+ salaAbertaDTO.integranteNovo.colaborador.id;
-                try {
-                    simpMessagingTemplate.convertAndSend(
-                            urlDestination
-                            ,alteracaoSaidaDTO.toJsonString());
-
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-        }));
-
-
-
-        return ResponseEntity.ok(salaAbertaDTO.salaNova);
+        return ResponseEntity.ok(salaAbertaWrapper.salaNova);
     }
 
     @GetMapping("/obterPorArte/{arteId}")

@@ -1,9 +1,6 @@
 package br.ufg.artattack.modelo;
 
-import br.ufg.artattack.dto.AlteracaoSaidaDTO;
-import br.ufg.artattack.dto.ArteDTO;
-import br.ufg.artattack.dto.IntegranteDTO;
-import br.ufg.artattack.dto.UsuarioDTO;
+import br.ufg.artattack.dto.*;
 
 import java.util.*;
 
@@ -39,7 +36,8 @@ public class Sala {
         this.uuid = uuid;
 
     }
-    public Integrante addIntegrante(UsuarioDTO usuarioDTO, List<TipoPermissao> permissoes){
+
+    public AddIntegranteWrapper addIntegrante(UsuarioDTO usuarioDTO, List<TipoPermissao> permissoes){
 
         Integrante adicionar;
 
@@ -53,7 +51,7 @@ public class Sala {
 
                 this.integrantes.set(i,adicionar);
 
-                return adicionar;
+                return new AddIntegranteWrapper(adicionar,false);
             }
 
         }
@@ -62,7 +60,7 @@ public class Sala {
 
         this.integrantes.add(adicionar);
 
-        return adicionar;
+        return new AddIntegranteWrapper(adicionar,false);
     }
 
     public List<TipoPermissao> obterPermissoesDoUsuario(Long idUsuario){
