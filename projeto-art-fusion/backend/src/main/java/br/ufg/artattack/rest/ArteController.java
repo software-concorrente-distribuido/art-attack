@@ -1,15 +1,25 @@
 package br.ufg.artattack.rest;
 
 import br.ufg.artattack.dto.*;
+import br.ufg.artattack.amqp.RabbitMQConfig;
+import br.ufg.artattack.amqp.ServicoRabbitMQ;
+import br.ufg.artattack.dto.AlteracaoSaidaDTO;
+import br.ufg.artattack.dto.ArteDTO;
+import br.ufg.artattack.dto.CompartilhamentoEntradaDTO;
+import br.ufg.artattack.dto.CompartilhamentoSaidaDTO;
 import br.ufg.artattack.modelo.Alteracao;
 import br.ufg.artattack.modelo.TipoPermissao;
 import br.ufg.artattack.modelo.Visibilidade;
 import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.servico.ArteServico;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import br.ufg.artattack.servico.UsuarioServico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.amqp.core.Message;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +35,11 @@ public class ArteController {
     ArteServico arteServico;
 
     @Autowired
+    ServicoRabbitMQ servicoRabbitMQ;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+    @Autowired
     UsuarioServico usuarioServico;
 
 
@@ -32,6 +47,12 @@ public class ArteController {
     public ResponseEntity<ArteDTO> criarArte(@RequestBody ArteDTO arteDTO){
 
         ArteDTO art = arteServico.criarArteDoUsuarioLogado(arteDTO);
+
+        String queueName = "arte."+art.id.toString();
+
+        servicoRabbitMQ.createDurableQueue(queueName);
+
+        servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,art.id.toString()+".geral");
 
         return ResponseEntity.ok(art);
     }

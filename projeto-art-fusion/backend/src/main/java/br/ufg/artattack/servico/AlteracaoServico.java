@@ -7,13 +7,10 @@ import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.repositorio.ArteRepositorio;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 @Service
@@ -28,22 +25,18 @@ public class AlteracaoServico {
     UsuarioServico usuarioServico;
 
 
-    private EntityManager entityManager;
-
     public AlteracaoServico(AlteracaoRepositorio alteracaoRepositorio,
                             ArteRepositorio arteRepositorio,
                             UsuarioRepositorio usuarioRepositorio,
-                            UsuarioServico usuarioServico,
-                            EntityManager entityManager
+                            UsuarioServico usuarioServico
                             ){
         this.alteracaoRepositorio = alteracaoRepositorio;
         this.arteRepositorio = arteRepositorio;
         this.usuarioRepositorio = usuarioRepositorio;
         this.usuarioServico = usuarioServico;
-        this.entityManager= entityManager;
     }
 
-    public AlteracaoSaidaDTO salvarPayloadAlteracao(AlteracaoEntradaDTO payload) throws JsonProcessingException, DataIntegrityViolationException {
+    public AlteracaoSaidaDTO gerarPayloadAlteracaoSaida(AlteracaoEntradaDTO payload) throws JsonProcessingException, DataIntegrityViolationException {
 
         AlteracaoSaidaDTO dto = new AlteracaoSaidaDTO(payload);
 

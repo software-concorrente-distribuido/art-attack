@@ -1,10 +1,8 @@
 package br.ufg.artattack.servico;
 
 import br.ufg.artattack.dto.AbrirSalaDTO;
-import br.ufg.artattack.modelo.Arte;
-import br.ufg.artattack.modelo.Sala;
-import br.ufg.artattack.modelo.Snapshot;
-import br.ufg.artattack.modelo.TipoPermissao;
+import br.ufg.artattack.dto.SalaAbertaDTO;
+import br.ufg.artattack.modelo.*;
 import br.ufg.artattack.repositorio.CompartilhamentoRepositorio;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,9 @@ public class SalaServico {
     @Autowired
     CompartilhamentoRepositorio compartilhamentoRepositorio;
 
-    public Sala abrirSala(Long arteId) throws BadRequestException {
+    public SalaAbertaDTO abrirSala(Long arteId) throws BadRequestException {
+
+        Integrante integranteNovo;
 
         if(!podeAbrirSala(arteId)){
             throw new BadRequestException("O usuário não pode abrir sala dessa arte!");
@@ -37,13 +37,13 @@ public class SalaServico {
             //sala já existente
             if(Objects.equals(s.getValue().arte.id, arteId)){
 
-                //atualizar usuario
-                s.getValue().addIntegrante(
+                //atualizar ou adiciona usuario
+                integranteNovo = s.getValue().addIntegrante(
                         usuarioServico.getUsuarioLogadoDTO(),
                         arteServico.permissoesPorArteUsuario(arteId, usuarioServico.getUsuarioLogadoId())
                 );
 
-                return s.getValue();
+                return new SalaAbertaDTO(s.getValue(),integranteNovo);
 
             }
 
@@ -51,20 +51,22 @@ public class SalaServico {
 
         return criarSala(arteId);
     }
-    private Sala criarSala(Long idArte) throws NoSuchElementException {
+
+    private SalaAbertaDTO criarSala(Long idArte) throws NoSuchElementException {
         String uuid = UUID.randomUUID().toString();
 
         Arte arte =  arteServico.arteRepositorio.findById(idArte).orElseThrow( () -> new NoSuchElementException("Arte não encontrada"));
 
         Sala sala = new Sala(uuid,arte);
 
-        sala.addIntegrante(
+        Integrante integranteNovo = sala.addIntegrante(
                 usuarioServico.getUsuarioLogadoDTO(),
                 arteServico.permissoesPorArteUsuario(idArte, usuarioServico.getUsuarioLogadoId())
         );
 
         salas.put(uuid, sala);
-        return sala;
+
+        return new SalaAbertaDTO(sala,integranteNovo);
     }
 
     public Sala obterSala(String uuid) {

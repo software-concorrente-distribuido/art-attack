@@ -30,16 +30,18 @@ public class Sala {
     }
     public Sala(String uuid, Arte arte){
 
-        integrantes =new ArrayList<>();
-
+        this.integrantes =new ArrayList<>();
 
         this.titulo = arte.titulo;
+
         this.arte = new ArteDTO(arte);
 
         this.uuid = uuid;
 
     }
-    public void addIntegrante(UsuarioDTO usuarioDTO, List<TipoPermissao> permissoes){
+    public Integrante addIntegrante(UsuarioDTO usuarioDTO, List<TipoPermissao> permissoes){
+
+        Integrante adicionar;
 
         for (int i = 0; i < this.integrantes.size(); i++) {
 
@@ -47,14 +49,20 @@ public class Sala {
 
             //integrante já está lá
             if (integrante.colaborador.id.equals(usuarioDTO.getId())) {
-                this.integrantes.set(i, new Integrante(usuarioDTO, permissoes,integrante.mensagensBuffer));
+                adicionar = new Integrante(usuarioDTO, permissoes);
 
-                return;
+                this.integrantes.set(i,adicionar);
+
+                return adicionar;
             }
 
         }
 
-        this.integrantes.add(new Integrante(usuarioDTO,permissoes));
+        adicionar = new Integrante(usuarioDTO,permissoes);
+
+        this.integrantes.add(adicionar);
+
+        return adicionar;
     }
 
     public List<TipoPermissao> obterPermissoesDoUsuario(Long idUsuario){
@@ -72,13 +80,6 @@ public class Sala {
         return integrantes.stream().map(IntegranteDTO::new).toList();
     }
 
-    public void colocarNoBufferDoIntegrante(Long usuarioId, String alteracao){
-
-        Integrante integrante = getIntegrante(usuarioId);
-
-        integrante.mensagensBuffer.add(alteracao);
-
-    }
 
     public Integrante getIntegrante(Long usuarioId){
         return integrantes.stream().filter(i->i.colaborador.id.equals(usuarioId.toString())).toList().get(0);

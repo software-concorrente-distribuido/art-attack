@@ -36,6 +36,9 @@ public class ArteServico {
         templateArte.titulo = arteDTO.titulo;
         templateArte.dataCriacao = new Date();
 
+        if(arteRepositorio.existsByTituloAndAdministradorId(templateArte.titulo,templateArte.administrador.getId()))
+            throw new IllegalArgumentException("Esse título já existe para o usuário "+ templateArte.administrador.email);
+
         var arteDoBanco = arteRepositorio.save(templateArte);
 
         atribuirAcessos(Arrays.stream(TipoPermissao.values()).toList(),arteDoBanco.getId(),templateArte.administrador.getId());
