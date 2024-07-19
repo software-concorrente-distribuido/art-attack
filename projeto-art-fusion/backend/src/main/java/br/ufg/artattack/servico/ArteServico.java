@@ -1,9 +1,7 @@
 package br.ufg.artattack.servico;
 
-import br.ufg.artattack.dto.ArteDTO;
-import br.ufg.artattack.dto.CompartilhamentoEntradaDTO;
-import br.ufg.artattack.dto.CompartilhamentoSaidaDTO;
-import br.ufg.artattack.dto.UsuarioDTO;
+import br.ufg.artattack.dto.*;
+import br.ufg.artattack.exception.ProcessamentoException;
 import br.ufg.artattack.modelo.Arte;
 import br.ufg.artattack.modelo.Compartilhamento;
 import br.ufg.artattack.modelo.TipoPermissao;
@@ -73,11 +71,11 @@ public class ArteServico {
 
         //existe algum par arte-usuario-permissao que tenha a permissao em uma das requisicoes de dto.permissao?
 
-        if(compartilhamentoRepositorio.existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(
+        if(Boolean.TRUE.equals(compartilhamentoRepositorio.existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(
                 dto.arteId,
                 Long.valueOf(usuarioServico.getUsuarioLogadoDTO().id),
                 dto.permissoes
-                ))
+                )))
             return true;
 
         return  false;
@@ -92,10 +90,10 @@ public class ArteServico {
             throw new UnsupportedOperationException("Usuário não possui permissão para compartilhar a arte com os acessos requisitados ou os IDs são inválidos!");
 
 
-        if(compartilhamentoRepositorio.existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(
+        if(Boolean.TRUE.equals(compartilhamentoRepositorio.existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(
                 dto.arteId,
                 dto.usuarioBeneficiadoId,
-                dto.permissoes))
+                dto.permissoes)))
             throw new IllegalArgumentException("Arte já foi compartilhada à esse usuário com essa permissão! ");
 
 
@@ -117,13 +115,11 @@ public class ArteServico {
 
             compartilhamentoRepositorio.saveAll(compartilhamentosNovos);
 
-            return compartilhamentosNovos.stream().map(c->new CompartilhamentoSaidaDTO(c)).toList();
-
+            return CompartilhamentoSaidaDTO.createList(compartilhamentosNovos);
     }
 
-    public List obterCompartilhadasPorUsuario(Long usuarioId) {
-        List<Compartilhamento> compartilhamentos = compartilhamentoRepositorio.findAllByUsuarioId(usuarioId);
-        return compartilhamentos.stream().map(c->new CompartilhamentoSaidaDTO(c)).toList();
+    public List<CompartilhamentoSaidaDTO> obterCompartilhadasAMim() {
+        return this.obterCompartilhadasAoUsuario(usuarioServico.getUsuarioLogadoId());
     }
 
     public List<TipoPermissao> permissoesPorArteUsuario(Long arteId, Long usuarioId){
@@ -141,5 +137,45 @@ public class ArteServico {
 
     public boolean isArtePublica(Long idArte) {
         return arteRepositorio.existsByIdAndVisibilidade(idArte, Visibilidade.PUBLICO);
+    }
+
+    public ArteDTO editarTituloArte(String novoTitulo, String arteId) {
+    var arte= arteRepositorio.findByIdAndAdministrador_Id(Long.valueOf(arteId),usuarioServico.getUsuarioLogadoId());
+    if(arte==null)
+        throw new ProcessamentoException("Arte inexistente para o par arteId - administradorId (do token)");
+
+    arte.titulo = novoTitulo;
+
+    arteRepositorio.save(arte);
+
+    return new ArteDTO(arte);
+    }
+
+    public List<ArteDTO> obterMinhasArtes() {
+        return arteRepositorio.findByAndAdministrador_Id(
+                usuarioServico.getUsuarioLogadoId()).stream().map(ArteDTO::new).toList();
+    }
+
+    public ArteDTO editarVisibilidade(EditarVisibilidadeDTO dto) {
+        var arte = arteRepositorio.findById(dto.arteId).orElseThrow();
+        arte.visibilidade = dto.visibilidade;
+        arteRepositorio.save(arte);
+        return new ArteDTO(arte);
+    }
+
+
+    public List<CompartilhamentoSaidaDTO> obterCompartilhadasAoUsuario(Long id) {
+        var compartilhamentos = compartilhamentoRepositorio.
+                findAllByUsuarioIdAndArteAdministradorIdNot(id, id);
+
+        return CompartilhamentoSaidaDTO.createList(compartilhamentos);
+    }
+
+    public List<ArteDTO> obterPorVisibilidade(ArtePorUsrVisibilidadeDTO dto) {
+        dto.visibilidades.remove(Visibilidade.PRIVADO);
+        return arteRepositorio.findByAdministrador_IdAndVisibilidadeIn(dto.usuarioId,dto.visibilidades).stream().map(
+                ArteDTO::new
+        ).toList();
+
     }
 }

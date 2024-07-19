@@ -18,5 +18,6 @@ public interface CompartilhamentoRepositorio extends JpaRepository<Compartilhame
 
     Boolean existsByArte_IdAndUsuarioIdAndTipoPermissaoIn(Long arteId, Long usuarioId, List<TipoPermissao> tipoPermissaos);
 
-
+    @EntityGraph(attributePaths = {"arte","arte.administrador","arte.titulo","arte.visibilidade"})
+    List<Compartilhamento> findAllByUsuarioIdAndArteAdministradorIdNot(Long id1, Long id2);
 }

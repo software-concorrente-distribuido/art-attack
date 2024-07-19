@@ -18,6 +18,8 @@ public class ArteDTO {
 
     public Date dataCriacao;
 
+    public String visibilidade;
+
     public ArteDTO(){
 
     }
@@ -27,6 +29,7 @@ public class ArteDTO {
         this.dataCriacao = arte.dataCriacao;
         this.titulo = arte.titulo;
         var user = arte.administrador;
+        this.visibilidade = arte.visibilidade.toString();
         if(user!=null){
            this.administrador = new UsuarioDTO(arte.administrador);
         }
