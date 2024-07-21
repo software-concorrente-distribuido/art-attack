@@ -1,4 +1,5 @@
 import api from '../api';
+import Cookies from "js-cookie";
 
 class ApiServices {
     // Função para abrir uma sala
@@ -26,11 +27,28 @@ class ApiServices {
         }
     }
 
-    // Função para listar todas as artes
-    static async listarArtes() {
+    // // Função para listar todas as artes
+    // static async listarArtes() {
+    //     console.debug('listando artees');
+    //     try {
+    //         const response = await api.get('/arte/listar');
+    //         console.debug(response);
+    //         return response.data; // Retorna diretamente o array de artes
+    //     } catch (error) {
+    //         console.error('Erro ao listar artes:', error);
+    //         throw error;
+    //     }
+    // }
+
+    // Função para listar minhas artes
+    static async listarMinhasArtes() {
         console.debug('listando artees');
         try {
-            const response = await api.get('/arte/listar');
+            const response = await api.get('/arte/todasQueTenhoAcesso',{
+                headers : {
+                    Authorization : `Bearer ${Cookies.get('user_token')}`
+                }
+            });
             console.debug(response);
             return response.data; // Retorna diretamente o array de artes
         } catch (error) {

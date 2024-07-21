@@ -33,9 +33,12 @@ const Paint = () => {
     const setupSocket = (token) => {
         if (salaUUID) {
             socketService.connect(() => {
-                console.log('Subscribing to /topic/alteracoes...', salaUUID);
+                 let payload = jwtDecode(token);
+                 let usuario = JSON.parse(payload.usuario);
+                 const idUser = usuario.id;
+                console.log(`SE INSCREVENDO EM /topic/alteracoes/${salaUUID}/${idUser}`);
                 socketService.subscribe(
-                    `/topic/alteracoes/${salaUUID}`,
+                    `/topic/alteracoes/${salaUUID}/${idUser}`,
                     (message) => {
                         //console.log('Raw message received:', message);
 

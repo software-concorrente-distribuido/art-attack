@@ -21,6 +21,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.amqp.core.Message;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -69,11 +70,6 @@ public class ArteController {
 
 
 
-    @GetMapping("/recuperarAlteracoes/{arteId}")
-    public ResponseEntity<List<Alteracao>> recuperarAlteracoes(@PathVariable Long arteId){
-
-        return ResponseEntity.ok(alteracaoRepositorio.findAlteracaoByArte_Id(arteId));
-    }
 
     @GetMapping("/recuperarSnapshot/{arteId}")
     public ResponseEntity<byte[]> recuperarSnapshot(@PathVariable Long arteId){
@@ -96,6 +92,16 @@ public class ArteController {
     @GetMapping()
     public ResponseEntity<List<ArteDTO>> getMinhasArtes(){
         return ResponseEntity.ok(arteServico.obterMinhasArtes());
+    }
+
+    @GetMapping("/todasQueTenhoAcesso")
+    public ResponseEntity<List<ArteDTO>> getArtesQueTenhoAcesso(){
+
+            List<ArteDTO> resposta = new ArrayList<>();
+            resposta.addAll(arteServico.obterMinhasArtes());
+            resposta.addAll(arteServico.obterCompartilhadasAMim().stream().map(c->c.arteDTO).toList());
+
+        return ResponseEntity.ok(resposta);
     }
 
     @PostMapping("/editarVisibilidade")
