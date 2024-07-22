@@ -68,17 +68,17 @@ export const updateElement = (
                     flushBuffer(salaUUID, arteId, userId);
                 }
 
-                elementsCopy[index] = {
-                    ...elementsCopy[index],
-                    points: [
-                        ...elementsCopy[index].points,
-                        {
-                            x: x2,
-                            y: y2,
-                        },
-                    ],
-                };
-                store.dispatch(setElements(elementsCopy));
+                // elementsCopy[index] = {
+                //     ...elementsCopy[index],
+                //     points: [
+                //         ...elementsCopy[index].points,
+                //         {
+                //             x: x2,
+                //             y: y2,
+                //         },
+                //     ],
+                // };
+                // store.dispatch(setElements(elementsCopy));
                 break;
             case toolTypes.CIRCLE:
                 // Calcular o raio com base nos novos x2 e y2
@@ -99,9 +99,9 @@ export const updateElement = (
                     radius, // Adiciona o raio ao elemento
                 });
 
-                elementsCopy[index] = updatedCircleElement;
+                // elementsCopy[index] = updatedCircleElement;
 
-                store.dispatch(setElements(elementsCopy));
+                // store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
                     salaUUID,
@@ -117,44 +117,19 @@ export const updateElement = (
                     y1,
                     x2,
                     y2,
+                    fromSocket: false,
                     toolType: type,
                     lineWidth: elementsCopy[index].lineWidth,
                     color: elementsCopy[index].color,
                 });
 
-                elementsCopy[index] = updatedElement;
+                // elementsCopy[index] = updatedElement;
 
-                store.dispatch(setElements(elementsCopy));
+                // store.dispatch(setElements(elementsCopy));
 
                 socketService.sendElementUpdate(
                     salaUUID,
                     formatDrawingData(updatedElement, arteId, userId)
-                );
-                break;
-            case toolTypes.SPRAY:
-                const newSprayPoints = generateSprayPoints(x2, y2, lineWidth);
-                elementsCopy[index] = {
-                    ...elementsCopy[index],
-                    points: [
-                        ...elementsCopy[index].points,
-                        {
-                            x: x2,
-                            y: y2,
-                        },
-                    ],
-                    sprayPoints: [
-                        ...elementsCopy[index].sprayPoints,
-                        ...newSprayPoints,
-                    ],
-                };
-
-                const updatedSprayElement = elementsCopy[index];
-
-                store.dispatch(setElements(elementsCopy));
-
-                socketService.sendElementUpdate(
-                    salaUUID,
-                    formatDrawingData(updatedSprayElement, 1, userId)
                 );
                 break;
             default:

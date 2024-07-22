@@ -49,16 +49,14 @@ const Paint = () => {
                             return;
                         }
 
-                        const decoded = jwtDecode(token);
-                        const usuario = JSON.parse(decoded.usuario);
-
-                        if (message.usuarioId == usuario.id) {
-                            return;
-                        }
-
                         try {
                             //atualiza o redux para desenhar os elementos recebidos
-                            dispatch(updateElementInStore(message.delta));
+                            dispatch(
+                                updateElementInStore({
+                                    ...message.delta,
+                                    fromSocket: true,
+                                })
+                            );
                         } catch (error) {
                             console.error('Erro ao obter o delta:', error);
                         }

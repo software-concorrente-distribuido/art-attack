@@ -55,7 +55,10 @@ const Whiteboard = () => {
 
         // redesenha os elementos sempre que o estado elements do Redux é alterado
         elements.forEach((element) => {
-            drawElement({ context: ctx, element });
+            if (element.fromSocket === true) {
+                // Desenha apenas elementos recebidos via socket
+                drawElement({ context: ctx, element });
+            }
         });
     }, [elements]);
 
