@@ -1,5 +1,6 @@
 package br.ufg.artattack.amqp;
 
+import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -82,6 +83,11 @@ public class RabbitMQConfig {
     @Bean
     public SimpleMessageListenerContainer messageListenerContainer(ConnectionFactory connectionFactory) {
         return new SimpleMessageListenerContainer(connectionFactory);
+    }
+
+    @Bean
+    public Channel rabbitChannel(ConnectionFactory connectionFactory) throws Exception {
+        return connectionFactory.createConnection().createChannel(true);
     }
 
 

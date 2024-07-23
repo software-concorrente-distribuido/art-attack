@@ -1,6 +1,8 @@
 package br.ufg.artattack.amqp;
 
 import br.ufg.artattack.dto.SalaAbertaWrapper;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.GetResponse;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,6 +12,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +32,10 @@ public class ServicoRabbitMQ {
     @Autowired
     private Jackson2JsonMessageConverter jackson2JsonMessageConverter;
 
+    @Autowired
+    private Channel channel;
+
+
     private final Map<String, SimpleMessageListenerContainer> containers = new HashMap<>();
 
 
@@ -46,6 +53,11 @@ public class ServicoRabbitMQ {
         return getEspecificoBindingKey(salaAbertaWrapper.salaNova.arte.id, salaAbertaWrapper.integranteRequerinte.colaborador.id);
     }
 
+    public String getArteIdFromEspecificoBindingKey(String especificoBindingKey){
+
+        return  especificoBindingKey.split("\\.")[0];
+
+    }
 
     public boolean queueExists(String queueName){
         return rabbitAdmin.getQueueProperties(queueName) != null;
@@ -118,4 +130,31 @@ public class ServicoRabbitMQ {
         }
     }
 
+    public String createReadOnlyConsumer(String queueName, MessageListenerAdapter listenerAdapter) {
+
+        listenerAdapter.setMessageConverter(jackson2JsonMessageConverter);
+        SimpleMessageListenerContainer listenerRuntime = new SimpleMessageListenerContainer();
+        listenerRuntime.setConnectionFactory(rabbitAdmin.getRabbitTemplate().getConnectionFactory());
+        listenerRuntime.addQueues(new Queue(queueName));
+        listenerRuntime.setMessageListener(listenerAdapter);
+        listenerRuntime.setAcknowledgeMode(AcknowledgeMode.MANUAL);
+        listenerRuntime.start();
+
+        containers.put(queueName, listenerRuntime);
+
+        return "Consumer created for queue: " + queueName;
+    }
+
+
+    public String obterQueueArte(String id) {
+        return "arte."+id;
+    }
+
+    public String obterQueueArte(Long id) {
+        return "arte."+id.toString();
+    }
+
+    public RabbitAdmin getRabbitAdmin() {
+        return rabbitAdmin;
+    }
 }

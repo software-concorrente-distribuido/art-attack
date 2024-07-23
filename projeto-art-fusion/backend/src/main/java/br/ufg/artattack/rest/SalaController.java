@@ -1,10 +1,10 @@
 package br.ufg.artattack.rest;
 
+import br.ufg.artattack.amqp.AbrirSalaConsumidor;
 import br.ufg.artattack.amqp.RabbitMQConfig;
 import br.ufg.artattack.amqp.ServicoRabbitMQ;
-import br.ufg.artattack.amqp.UsuarioSalaSocketEnviador;
+import br.ufg.artattack.amqp.RabbitArtFusionConsumer;
 import br.ufg.artattack.dto.AbrirSalaDTO;
-import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.dto.SalaAbertaWrapper;
 import br.ufg.artattack.modelo.Sala;
 import br.ufg.artattack.servico.ArteServico;
@@ -52,9 +52,13 @@ public class SalaController {
 
         servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, especificoBindingKey);
 
+        // a partir daqui, as mensagens do desenho estarão chegando
         servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey);
 
-        servicoRabbitMQ.createConsumer(queueName, new MessageListenerAdapter(new UsuarioSalaSocketEnviador(salaAbertaWrapper,simpMessagingTemplate)));
+
+        servicoRabbitMQ.createReadOnlyConsumer(queueName, new MessageListenerAdapter(new AbrirSalaConsumidor(queueName,servicoRabbitMQ)));
+
+        servicoRabbitMQ.createConsumer(queueName, new MessageListenerAdapter(new RabbitArtFusionConsumer(salaAbertaWrapper,simpMessagingTemplate)));
 
         return ResponseEntity.ok(salaAbertaWrapper.salaNova);
     }

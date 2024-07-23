@@ -52,13 +52,13 @@ public class AlteracaoServico {
 
         alteracao.dataCriacao = new Date();
 
-        alteracao = alteracaoRepositorio.save(alteracao);
+//        alteracao = alteracaoRepositorio.save(alteracao);
 
         dto.dataCriacao = alteracao.dataCriacao.getTime();
 
         dto.usuarioId = idUsuarioLogado;
 
-        dto.id = alteracao.getId();
+//        dto.id = alteracao.getId();
 
         return dto;
     }

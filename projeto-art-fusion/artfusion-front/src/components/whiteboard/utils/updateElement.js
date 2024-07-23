@@ -16,7 +16,7 @@ const formatDrawingData = (element, arteId, usuarioId) => {
 };
 
 const buffer = {};
-const BUFFER_LIMIT = 10;
+const BUFFER_LIMIT = 1;
 
 export const flushBuffer = (salaUUID, arteId, userId, forceFlush = false) => {
     Object.keys(buffer).forEach((id) => {
