@@ -29,6 +29,7 @@ const Login = () => {
         }
 
         navigate('/home');
+
     };
 
     const isFormValid = email && password;

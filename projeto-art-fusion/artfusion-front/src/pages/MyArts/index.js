@@ -5,7 +5,7 @@ import styled from "styled-components"
 import Title from '../../components/Title'
 import Button from '../../components/Button';
 import TopBar from '../../components/TopBar'
-import Card from '../../components/Card'
+import ContainerMinhasArtes from '../../components/Containers/ContainerMinhasArtes';
 
 import ContainerTitleButton from '../../components/Containers/ContainerTitleButton'
 
@@ -30,7 +30,8 @@ const MyArts = () => {
                     </ContainerTitleButton>
 
                     <TopBar></TopBar>
-                    <Card></Card>
+
+                    <ContainerMinhasArtes></ContainerMinhasArtes>
 
                 </ContainerArtesRecentes>
                 <SideBar></SideBar>
