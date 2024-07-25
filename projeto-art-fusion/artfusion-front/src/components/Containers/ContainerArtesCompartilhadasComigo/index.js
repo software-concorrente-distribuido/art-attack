@@ -48,14 +48,14 @@ const TextCard = styled.h2`
     text-overflow: ellipsis; 
 `
 
-const ContainerMinhasArtes = () => {
+const ContainerArtesCompartilhadasComigo = () => {
     const [arteName, setArteName] = useState('');
     const [artes, setArtes] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        ApiServices.listarSomenteMinhasArtes()
+        ApiServices.listarArtesCompartilhadasMinhas()
             .then(setArtes)
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -99,9 +99,9 @@ const ContainerMinhasArtes = () => {
                             onClick={() => handleSelectArte(arte.id)}
                         >
                             <img src={Picture} alt="Arte" />
-                            <TitleCard>{arte.titulo}</TitleCard>
-                            <TextCard>Data de criação: {formatDate(arte.dataCriacao)}</TextCard>
-                            <TextCard>ID adm: {arte.administrador.id}</TextCard>
+                            <TitleCard>{arte.arteDTO.titulo}</TitleCard>
+                            <TextCard>Administrador: {arte.arteDTO.administrador.email}</TextCard>
+                            {console.log(arte)};
                         </CardContainer>
                     ))}
                 </ArtList>
@@ -110,4 +110,4 @@ const ContainerMinhasArtes = () => {
     );
 };
 
-export default ContainerMinhasArtes;
+export default ContainerArtesCompartilhadasComigo;

@@ -8,7 +8,8 @@ import Paint from '../pages/Paint';
 import HomeTempo from '../pages/HomeTempo';
 import SharedArts from '../pages/SharedArts';
 import MyArts from '../pages/MyArts';
-import RecentArts from '../pages/RecentArts';
+import RecentArtsPreview from '../pages/RecentArtsPreview';
+import RecentArtsContribution from '../pages/RecentArtsPreview';
 import EditProfileModal from '../modals/EditProfileModal';
 import ShareModal from '../modals/ShareModal';
 
@@ -38,10 +39,17 @@ const RoutesApp = () => {
                         path="/artes-compartilhadas"
                         element={<SharedArts />}
                     />
+
                     <Route
                         exact
-                        path="/artes-recentes"
-                        element={<RecentArts />}
+                        path="/artes-recentes-preview"
+                        element={<RecentArtsPreview />}
+                    />
+
+                    <Route
+                        exact
+                        path="/artes-recentes-contribution"
+                        element={<RecentArtsContribution />}
                     />
 
                     <Route

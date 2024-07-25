@@ -36,7 +36,7 @@ function ItensSideBarHome() {
     return (
         <ItensSideBar>
             <LinkContainer>
-                <Link to="/artes-recentes">
+                <Link to="/artes-recentes-contribution">
                     <ItenSideBar>
                         <ImagemIten src={colorpaletteoutline}></ImagemIten>Artes Recentes
                     </ItenSideBar>
