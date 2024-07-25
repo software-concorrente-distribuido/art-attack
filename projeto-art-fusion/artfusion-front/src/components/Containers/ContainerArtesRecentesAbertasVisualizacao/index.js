@@ -48,14 +48,14 @@ const TextCard = styled.h2`
     text-overflow: ellipsis; 
 `
 
-const ContainerMinhasArtes = () => {
+const ContainerArtesRecentesAbertasVisualizacao = () => {
     const [arteName, setArteName] = useState('');
     const [artes, setArtes] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        ApiServices.listarSomenteMinhasArtes()
+        ApiServices.listarTodasArtes()
             .then(setArtes)
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -110,4 +110,4 @@ const ContainerMinhasArtes = () => {
     );
 };
 
-export default ContainerMinhasArtes;
+export default ContainerArtesRecentesAbertasVisualizacao;

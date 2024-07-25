@@ -55,7 +55,7 @@ const Home = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        ApiServices.listarMinhasArtes()
+        ApiServices.listarTodasArtes()
             .then(setArtes)
             .catch(console.error)
             .finally(() => setLoading(false));

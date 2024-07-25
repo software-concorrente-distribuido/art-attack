@@ -8,6 +8,8 @@ import TopBar from '../../components/TopBar'
 import Card from '../../components/Card'
 
 import ContainerTitleButton from '../../components/Containers/ContainerTitleButton'
+import ContainerArtesCompartilhadasComigo from '../../components/Containers/ContainerArtesCompartilhadasComigo'
+
 
 const ConteinerArtesRecentesSideBar = styled.div`
     display: flex;
@@ -19,7 +21,7 @@ const ContainerArtesRecentes = styled.div`
     margin-left: 256px;
 `
 
-const RecentArtsArts = () => {
+const RecentArtsContribution = () => {
     return (
         <div>
             <ConteinerArtesRecentesSideBar>
@@ -30,7 +32,7 @@ const RecentArtsArts = () => {
                     </ContainerTitleButton>
 
                     <TopBar></TopBar>
-                    <Card></Card>
+                    <ContainerArtesCompartilhadasComigo></ContainerArtesCompartilhadasComigo>
 
                 </ContainerArtesRecentes>
                 <SideBar></SideBar>
@@ -39,4 +41,4 @@ const RecentArtsArts = () => {
     );
 };
 
-export default RecentArtsArts;
+export default RecentArtsContribution;

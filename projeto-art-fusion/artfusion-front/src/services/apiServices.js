@@ -41,7 +41,7 @@ class ApiServices {
     // }
 
     // Função para listar minhas artes
-    static async listarMinhasArtes() {
+    static async listarTodasArtes() {
         console.debug('listando artees');
         try {
             const response = await api.get('/arte/todasQueTenhoAcesso',{
@@ -74,6 +74,40 @@ class ApiServices {
             return response.data; // Retorna a arte criada
         } catch (error) {
             console.error('Erro ao criar arte:', error);
+            throw error;
+        }
+    }
+
+    // Função para listar artes compartilhadas comigo
+    static async listarArtesCompartilhadasMinhas() {
+        console.debug('listando artees');
+        try {
+            const response = await api.get('/arte/compartilhadasMinhas',{
+                headers : {
+                    Authorization : `Bearer ${Cookies.get('user_token')}`
+                }
+            });
+            console.debug(response);
+            return response.data; // Retorna diretamente o array de artes
+        } catch (error) {
+            console.error('Erro ao listar artes:', error);
+            throw error;
+        }
+    }
+
+    // Função para listar minhas artes
+    static async listarSomenteMinhasArtes() {
+        console.debug('listando artees');
+        try {
+            const response = await api.get('/arte',{
+                headers : {
+                    Authorization : `Bearer ${Cookies.get('user_token')}`
+                }
+            });
+            console.debug(response);
+            return response.data; // Retorna diretamente o array de artes
+        } catch (error) {
+            console.error('Erro ao listar artes:', error);
             throw error;
         }
     }
