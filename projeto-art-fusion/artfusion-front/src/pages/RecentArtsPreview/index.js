@@ -5,9 +5,11 @@ import styled from "styled-components"
 import Title from '../../components/Title'
 import Button from '../../components/Button';
 import TopBar from '../../components/TopBar'
-import ContainerMinhasArtes from '../../components/Containers/ContainerMinhasArtes';
+import Card from '../../components/Card'
 
 import ContainerTitleButton from '../../components/Containers/ContainerTitleButton'
+import ContainerArtesRecentesAbertasVisualizacao from '../../components/Containers/ContainerArtesRecentesAbertasVisualizacao'
+
 
 const ConteinerArtesRecentesSideBar = styled.div`
     display: flex;
@@ -19,17 +21,18 @@ const ContainerArtesRecentes = styled.div`
     margin-left: 256px;
 `
 
-const MyArts = () => {
+const RecentArtsPreview = () => {
     return (
         <div>
             <ConteinerArtesRecentesSideBar>
                 <ContainerArtesRecentes>
                     <ContainerTitleButton>
-                        <Title align={"left"}>Minhas Artes</Title>
+                        <Title align={"left"}>Artes Recentes</Title>
                         <Button width={"15%"} Text={"+     Nova Arte"}></Button>
                     </ContainerTitleButton>
 
-                    <ContainerMinhasArtes></ContainerMinhasArtes>
+                    <TopBar></TopBar>
+                    <ContainerArtesRecentesAbertasVisualizacao></ContainerArtesRecentesAbertasVisualizacao>
 
                 </ContainerArtesRecentes>
                 <SideBar></SideBar>
@@ -38,4 +41,4 @@ const MyArts = () => {
     );
 };
 
-export default MyArts;
+export default RecentArtsPreview;

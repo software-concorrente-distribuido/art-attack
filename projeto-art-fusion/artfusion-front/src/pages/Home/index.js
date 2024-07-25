@@ -11,19 +11,6 @@ const ConteinerArtesRecentesSideBar = styled.div`
     display: flex;
 `
 
-/*
-
-<ConteinerArtesRecentesSideBar>
-                <ArtesRecentes></ArtesRecentes>
-                <SideBar></SideBar>
-            </ConteinerArtesRecentesSideBar>
-
-
-
-
-            <EditProfileModal></EditProfileModal>
-*/
-
 const Home = () => {
     return (
         <C.Container>
