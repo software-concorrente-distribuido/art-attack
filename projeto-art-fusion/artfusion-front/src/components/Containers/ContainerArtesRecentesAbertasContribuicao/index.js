@@ -101,7 +101,6 @@ const ContainerArtesRecentesAbertasContribuicao = () => {
                             <img src={Picture} alt="Arte" />
                             <TitleCard>{arte.titulo}</TitleCard>
                             <TextCard>Data de criação: {formatDate(arte.dataCriacao)}</TextCard>
-                            <TextCard>ID adm: {arte.administrador.id}</TextCard>
                         </CardContainer>
                     ))}
                 </ArtList>

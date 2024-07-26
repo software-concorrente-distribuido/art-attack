@@ -42,14 +42,8 @@ const RoutesApp = () => {
 
                     <Route
                         exact
-                        path="/artes-recentes-preview"
+                        path="/artes-recentes"
                         element={<RecentArtsPreview />}
-                    />
-
-                    <Route
-                        exact
-                        path="/artes-recentes-contribution"
-                        element={<RecentArtsContribution />}
                     />
 
                     <Route

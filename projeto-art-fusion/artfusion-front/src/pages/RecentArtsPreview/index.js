@@ -31,7 +31,6 @@ const RecentArtsPreview = () => {
                         <Button width={"15%"} Text={"+     Nova Arte"}></Button>
                     </ContainerTitleButton>
 
-                    <TopBar></TopBar>
                     <ContainerArtesRecentesAbertasVisualizacao></ContainerArtesRecentesAbertasVisualizacao>
 
                 </ContainerArtesRecentes>
