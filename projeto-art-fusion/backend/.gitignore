@@ -37,7 +37,9 @@ out/
 .vscode/
 /src/main/resources/application-dev.properties
 dados
-
+src/main/resources/static/static
+src/main/resources/static/*.json
+src/main/resources/static/index.html
 
 
 
