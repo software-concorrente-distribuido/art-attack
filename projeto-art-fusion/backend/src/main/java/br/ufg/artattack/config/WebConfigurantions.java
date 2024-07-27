@@ -59,6 +59,9 @@ public class WebConfigurantions {
         configuration.addAllowedOrigin("http://localhost:3000"); // Permitir todas as origens
         configuration.addAllowedMethod("GET"); // Permitir todos os métodos HTTP
         configuration.addAllowedMethod("POST"); // Permitir todos os métodos HTTP
+        configuration.addAllowedOrigin("PUT");
+        configuration.addAllowedOrigin("DELETE");
+        configuration.addAllowedOrigin("HEAD");
 
         configuration.addAllowedHeader("*"); // Permitir todos os cabeçalhos
         configuration.setAllowCredentials(true);

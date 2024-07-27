@@ -27,7 +27,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         // endpoint para conexão do socket. não tem nada a ver com os acima
-        registry.addEndpoint("/artsocket").setAllowedOrigins("http://localhost:3000")
+        registry.addEndpoint("/artsocket").setAllowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:8089",
+                        "http://localhost:8080",
+                        "http://18.228.15.75:8089",
+                        "http://18.228.15.75",
+                        "http://ec2-18-228-15-75.sa-east-1.compute.amazonaws.com",
+                        "http://ec2-18-228-15-75.sa-east-1.compute.amazonaws.com:8089",
+                        "http://ec2-18-228-15-75.sa-east-1.compute.amazonaws.com:3000",
+                        "http://ec2-18-228-15-75.sa-east-1.compute.amazonaws.com:8080"
+                        )
                 .withSockJS();
     }
 

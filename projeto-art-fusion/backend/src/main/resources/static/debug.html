@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket with Spring</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.5/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/cjs/index.min.js"></script>
+
+    <script>
+        function limpar() {
+            document.querySelector("#resposta-server").innerHTML = "";
+        }
+
+        var stompClient = null;
+        let salaUUID = "";
+
+         function connect() {
+
+                    const accessToken =  document.querySelector("#token").value;
+                    const arteId = document.querySelector("#arteId").value;
+
+                    var socket = new SockJS('http://localhost:8089/artsocket');
+                    stompClient = Stomp.over(socket);
+                    stompClient.connect({"X-Authorization": "Bearer " + accessToken}, async function (frame) {
+
+
+                        //1 - ABRIR SALA!
+                        let fetchWrapper = await fetch("http://localhost:8089/api/sala/abrir",{
+                            method:"POST",
+                            body : `
+                            {  "arteId": ${arteId} }`,
+                            headers : {
+                                "Authorization" : "Bearer "+accessToken,
+                                "Content-Type": "application/json"
+                            }
+                        });
+
+                        fetchWrapper = await fetchWrapper.json();
+                        salaUUID = fetchWrapper.uuid;
+                        if(fetchWrapper["erro"]){
+                            alert(fetchWrapper["mensagem"])
+                            throw new Error("Erro!")
+                        }
+
+
+                        const userId= JSON.parse(jwtDecode(document.querySelector("#token").value).usuario).id;
+
+
+                        alert("Se inscrevendo em: "+'/topic/alteracoes/'+salaUUID)
+
+                        stompClient.subscribe(`/topic/alteracoes/${salaUUID}/${userId}`, function (message) {
+
+                            document.querySelector("#resposta-server").innerHTML = document.querySelector("#resposta-server").innerHTML + "<br/>" + message.body;
+
+                        });
+                    });
+        }
+
+        function sendEvent(value){
+            if (stompClient != null) {
+                stompClient.send( `/envio/alteracoes/${salaUUID}`, {}, value);
+            }
+        }
+        function enviarEvento(){
+            let mensagem= document.querySelector("#input-evento").value;
+            console.log(mensagem)
+            sendEvent(mensagem)
+        }
+
+        function disconnect() {
+             alert("desconectado!")
+            if (stompClient !== null) {
+                stompClient.disconnect();
+                stompClient = null;
+            }
+            console.log("Desconectado!");
+        }
+    </script>
+</head>
+<body>
+    <div style="display: flex; width: 600px; justify-content: end">
+        <button onclick="connect()">Conectar</button>
+        <button onclick="enviarEvento()">Enviar evento</button>
+        <button onclick="limpar()">Limpar broadcast log</button>
+
+        <button onclick="disconnect()">Desconectar</button>
+    </div>
+    <div style="
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: center;
+        width: 100%;
+">
+        <div style="width: 400px;display: flex;justify-content: start;flex-direction: column">
+            <div style="margin-right: 20px; margin-bottom: 20px; display: flex;flex-direction: column">
+                <label for="arteId">ArteId</label>
+                <input style="width: 100px" type="number" id="arteId">
+            </div>
+
+            <div style="margin-right: 20px; margin-bottom: 20px;display: flex;flex-direction: column">
+                <label for="token">Token JWT</label>
+                <input id="token">
+            </div>
+            <div style="display: flex;flex-direction: column">
+                <label for="input-evento">Mensagem</label>
+                <textarea style="min-height: 300px" id="input-evento"></textarea>
+            </div>
+
+        </div>
+        <div style="text-align: center">
+            <h1>Broadcast do servidor!</h1>
+            <p id="resposta-server">*nada ainda*</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
