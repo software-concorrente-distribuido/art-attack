@@ -54,15 +54,11 @@ public class WebConfigurantions {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("http:\\/\\/localhost:[0-9]*");
-        configuration.addAllowedOrigin("https://api.getpostman.com");
-        configuration.addAllowedOrigin("http://localhost:3000"); // Permitir todas as origens
-        configuration.addAllowedMethod("GET"); // Permitir todos os métodos HTTP
-        configuration.addAllowedMethod("POST"); // Permitir todos os métodos HTTP
-        configuration.addAllowedOrigin("PUT");
-        configuration.addAllowedOrigin("DELETE");
-        configuration.addAllowedOrigin("HEAD");
-
+        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedOrigin("http://52.67.57.216:8089");
+        for (HttpMethod value : HttpMethod.values()) {
+            configuration.addAllowedMethod(value);
+        }
         configuration.addAllowedHeader("*"); // Permitir todos os cabeçalhos
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

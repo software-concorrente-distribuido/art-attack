@@ -1,6 +1,7 @@
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import Cookies from 'js-cookie';
+import env from '../env/env'
 
 class SocketService {
     constructor() {
@@ -12,7 +13,7 @@ class SocketService {
         const token = Cookies.get('user_token');
 
         if (token) {
-            const socketUrl = 'http://localhost:8089/artsocket';
+            const socketUrl = `${env.api_protocol}://${env.api_host}:${env.api_port}/${env.socket_name}`;
 
             this.stompClient = Stomp.over(() => new SockJS(socketUrl));
             this.stompClient.reconnect_delay = 50;

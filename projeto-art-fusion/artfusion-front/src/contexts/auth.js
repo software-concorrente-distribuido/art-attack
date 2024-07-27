@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
+            console.log(
+                process.env
+            );
             const loginData = { email, senha: password };
 
             const response = await api.post('/auth/login', loginData);
@@ -35,10 +38,8 @@ export const AuthProvider = ({ children }) => {
             });
             setUser({ email });
         } catch (error) {
-            console.error(
-                'Errooooooooooor:',
-                error.response ? error.response.data : error.message
-            );
+
+
             return 'E-mail ou senha incorretos';
         }
     };
