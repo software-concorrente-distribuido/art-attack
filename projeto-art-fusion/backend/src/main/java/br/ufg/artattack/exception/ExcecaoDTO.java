@@ -27,7 +27,7 @@ public class ExcecaoDTO {
         this.causa = causa;
         this.erro = true;
     }
-    public String stringfy(){
+    public String toJsonString(){
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             return  objectMapper.writeValueAsString(this);

@@ -41,7 +41,7 @@ public class ArteController {
 
         ArteDTO art = arteServico.criarArteDoUsuarioLogado(arteDTO);
 
-        String queueName = servicoRabbitMQ.obterQueueArte(art.id);
+        String queueName = servicoRabbitMQ.getArteQueueName(art.id);
 
         servicoRabbitMQ.createDurableQueue(queueName);
 

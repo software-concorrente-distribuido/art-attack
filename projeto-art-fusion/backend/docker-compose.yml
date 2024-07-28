@@ -13,3 +13,5 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=joao
       - RABBITMQ_DEFAULT_PASS=hotwheels
+    command: >
+      sh -c "rabbitmq-plugins enable --offline rabbitmq_management && rabbitmq-server"

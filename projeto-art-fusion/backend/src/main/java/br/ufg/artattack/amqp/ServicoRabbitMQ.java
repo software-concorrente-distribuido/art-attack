@@ -1,18 +1,18 @@
 package br.ufg.artattack.amqp;
 
+import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.dto.SalaAbertaWrapper;
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.GetResponse;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,9 +28,9 @@ public class ServicoRabbitMQ {
     @Autowired
     private SimpleMessageListenerContainer listenerContainer;
 
-
-    @Autowired
-    private Jackson2JsonMessageConverter jackson2JsonMessageConverter;
+//
+//    @Autowired
+//    private Jackson2JsonMessageConverter jackson2JsonMessageConverter;
 
     @Autowired
     private Channel channel;
@@ -52,6 +52,13 @@ public class ServicoRabbitMQ {
     public static String getEspecificoBindingKey(SalaAbertaWrapper salaAbertaWrapper){
         return getEspecificoBindingKey(salaAbertaWrapper.salaNova.arte.id, salaAbertaWrapper.integranteRequerinte.colaborador.id);
     }
+
+    public static String getSalaUsuarioQueueName(String salaUuid, String integranteId) {
+
+        return salaUuid+"."+ integranteId;
+
+    }
+
 
     public String getArteIdFromEspecificoBindingKey(String especificoBindingKey){
 
@@ -83,8 +90,8 @@ public class ServicoRabbitMQ {
         return "Queue created: " + queueName;
     }
 
-    public String createNonDurableQueue(String queueName){
-        rabbitAdmin.declareQueue(new Queue(queueName,false));
+    public String createNonDurableQueueWithPriorities(String queueName){
+        rabbitAdmin.declareQueue(QueueBuilder.nonDurable(queueName).withArgument("x-max-priority", 10).build());
         return "Queue created: " + queueName;
     }
 
@@ -97,6 +104,10 @@ public class ServicoRabbitMQ {
         rabbitAdmin.deleteQueue(queueName);
         return "Queue deleted: " + queueName;
     }
+    public String purgeQueue(String queueName) {
+        rabbitAdmin.purgeQueue(queueName);
+        return "Queue purged: " + queueName;
+    }
 
     public String deleteExchange(String exchangeName) {
         rabbitAdmin.deleteExchange(exchangeName);
@@ -108,9 +119,10 @@ public class ServicoRabbitMQ {
         return "Message sent to exchange: " + exchangeName + " with routing key: " + routingKey;
     }
 
-    public String createConsumer(String queueName, MessageListenerAdapter listenerAdapter) {
+    public String createConsumer(String queueName, MessageListener listenerAdapter) {
 
-        listenerAdapter.setMessageConverter(jackson2JsonMessageConverter);
+//        listenerAdapter.setMessageConverter(jackson2JsonMessageConverter);
+//        listenerAdapter.setMessageConverter(new SimpleMessageConverter());
         SimpleMessageListenerContainer listenerRuntime = new SimpleMessageListenerContainer();
         listenerRuntime.setConnectionFactory(rabbitAdmin.getRabbitTemplate().getConnectionFactory());
         listenerRuntime.addQueues(new Queue(queueName));
@@ -130,9 +142,8 @@ public class ServicoRabbitMQ {
         }
     }
 
-    public String createReadOnlyConsumer(String queueName, MessageListenerAdapter listenerAdapter) {
+    public String createReadOnlyConsumer(String queueName, MessageListener listenerAdapter) {
 
-        listenerAdapter.setMessageConverter(jackson2JsonMessageConverter);
         SimpleMessageListenerContainer listenerRuntime = new SimpleMessageListenerContainer();
         listenerRuntime.setConnectionFactory(rabbitAdmin.getRabbitTemplate().getConnectionFactory());
         listenerRuntime.addQueues(new Queue(queueName));
@@ -146,15 +157,20 @@ public class ServicoRabbitMQ {
     }
 
 
-    public String obterQueueArte(String id) {
+    public static String getArteQueueName(String id) {
         return "arte."+id;
     }
 
-    public String obterQueueArte(Long id) {
+    public static String getArteQueueName(Long id) {
         return "arte."+id.toString();
     }
 
     public RabbitAdmin getRabbitAdmin() {
         return rabbitAdmin;
+    }
+
+
+    public RabbitTemplate getRabbitTemplate() {
+        return rabbitTemplate;
     }
 }

@@ -9,10 +9,12 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Date;
 
 @SpringBootApplication
+@EnableScheduling
 public class ArtAttackApplication {
 
     public static void main(String[] args) {
@@ -46,11 +48,11 @@ public class ArtAttackApplication {
     public void garantirQueuesARte(){
 
         arteRepositorio.findAll().forEach(art->{
-            String queueName = servicoRabbitMQ.obterQueueArte(art.getId());
+            String queueName = ServicoRabbitMQ.getArteQueueName(art.getId());
 
             servicoRabbitMQ.createDurableQueue(queueName);
 
-            servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,art.getId().toString()+".geral");
+            servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,ServicoRabbitMQ.getGeralBindingKey(art.getId()));
 
         });
 

@@ -2,38 +2,44 @@ package br.ufg.artattack.amqp;
 
 
 import br.ufg.artattack.dto.AlteracaoSaidaDTO;
-import br.ufg.artattack.dto.SalaAbertaWrapper;
-import br.ufg.artattack.exception.ProcessamentoException;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
-public class AbrirSalaConsumidor {
+public class AbrirSalaConsumidor implements ChannelAwareMessageListener {
 
     private ServicoRabbitMQ servicoRabbitMQ;
-    private RabbitAdmin rabbitAdmin;
-    private String queue;
+    private String exchange;
+    private String bindingKey;
 
-
-    public AbrirSalaConsumidor(String queue,ServicoRabbitMQ servicoRabbitMQ){
+    public AbrirSalaConsumidor(String exchange,String bindingKey, ServicoRabbitMQ servicoRabbitMQ){
         this.servicoRabbitMQ = servicoRabbitMQ;
-        this.rabbitAdmin  = servicoRabbitMQ.getRabbitAdmin();
-        this.queue = queue;
+        this.exchange =exchange;
+        this.bindingKey = bindingKey;
     }
 
-    public void handleMessage(AlteracaoSaidaDTO alteracaoSaidaDTO){
-
+    @Override
+    public void onMessage(Message message, Channel channel) throws Exception {
+        var rabbitTemplate = servicoRabbitMQ.getRabbitTemplate();
         try {
-            //TODO
+//            AlteracaoSaidaDTO alteracaoSaidaDTO = new ObjectMapper().readValue(new String(message.getBody()), AlteracaoSaidaDTO.class);
 
-            //rabbitAdmin.enviarMensagensComPrioridadeParaFila(queue,alteracaoSaidaDTO);
+            rabbitTemplate.convertAndSend(
+                    exchange,
+                    bindingKey,
+                    message,
+                    msg->{
+                        msg.getMessageProperties().setPriority(10);
+                        return msg;
+                    }
+            );
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+
 
         } catch (Exception e) {
-            throw new ProcessamentoException(e);
+            //skip
         }
-
     }
 
 }

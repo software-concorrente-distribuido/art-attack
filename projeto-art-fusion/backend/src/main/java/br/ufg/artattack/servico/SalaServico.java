@@ -1,19 +1,117 @@
 package br.ufg.artattack.servico;
 
+import br.ufg.artattack.amqp.ServicoRabbitMQ;
 import br.ufg.artattack.dto.AddIntegranteWrapper;
+import br.ufg.artattack.dto.IntegranteDTO;
 import br.ufg.artattack.dto.SalaAbertaWrapper;
 import br.ufg.artattack.modelo.*;
 import br.ufg.artattack.repositorio.CompartilhamentoRepositorio;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.coyote.BadRequestException;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Service
 public class SalaServico {
 
     private static Map<String, Sala> salas = new HashMap<>();
+
+    @Autowired
+    RabbitAdmin rabbitAdmin;
+
+
+    @Autowired
+    ServicoRabbitMQ servicoRabbitMQ;
+
+    @Value("${spring.rabbitmq.username}")
+    String username;
+
+    @Value("${spring.rabbitmq.password}")
+    String password;
+
+    @Value("${spring.rabbitmq.host}")
+    String host;
+
+
+    @Scheduled(fixedRate = 30000) // 3s em milissegundos
+    public void limparSalasOciosas() throws URISyntaxException, JsonProcessingException {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+        headers.add("Accept-Language", "pt-BR,pt;q=0.9");
+        headers.add("Cache-Control", "max-age=0");
+        headers.add("Connection", "keep-alive");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        var urlBuilder = new StringBuilder().append("http://").append(host).append(":").append("15672").append("/api/queues/%2F/");
+
+//        String url = "http://localhost:15672/api/queues/%2F/";
+
+        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor(username, password));
+
+        ArrayList<String> uuids = new ArrayList<>();
+
+        for (Map.Entry<String, Sala> par : salas.entrySet()) {
+
+            String arteQueueName = ServicoRabbitMQ.getArteQueueName(par.getValue().arte.id);
+
+            ResponseEntity<String> response = restTemplate.exchange(new URI(urlBuilder+arteQueueName), HttpMethod.GET, entity, String.class);
+
+            JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
+
+            var ideSince = jsonNode.get("idle_since").toString();
+
+            if(ideSince==null){
+                return;
+            }
+
+            ideSince = ideSince.replace("\"","");
+
+            var instanteParado = LocalDateTime.parse(ideSince, DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
+
+            var agora = LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo"));
+
+            if(Duration.between(instanteParado,agora).toSeconds() >120 ){
+
+                for (IntegranteDTO integrante : par.getValue().getIntegrantes()) {
+
+                    String salaUsuarioQueueName= ServicoRabbitMQ.getSalaUsuarioQueueName(par.getKey(),integrante.colaborador.id);
+                    servicoRabbitMQ.stopConsumer(salaUsuarioQueueName);
+                    servicoRabbitMQ.deleteQueue(salaUsuarioQueueName);
+                    servicoRabbitMQ.purgeQueue(salaUsuarioQueueName);
+
+                }
+                uuids.add(par.getKey());
+
+            }
+        }
+
+        for (String uuid : uuids) {
+            salas.remove(uuid);
+        }
+
+    }
 
     @Autowired
     UsuarioServico usuarioServico;
