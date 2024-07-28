@@ -36,25 +36,13 @@ public class AlteracaoServico {
         this.usuarioServico = usuarioServico;
     }
 
-    public AlteracaoSaidaDTO gerarPayloadAlteracaoSaida(AlteracaoEntradaDTO payload) throws JsonProcessingException, DataIntegrityViolationException {
+    public AlteracaoSaidaDTO gerarPayloadAlteracaoSaida(AlteracaoEntradaDTO payload){
 
         AlteracaoSaidaDTO dto = new AlteracaoSaidaDTO(payload);
 
-        Long idUsuarioLogado = Long.valueOf(usuarioServico.getUsuarioLogadoDTO().id);
+        long idUsuarioLogado = Long.parseLong(usuarioServico.getUsuarioLogadoDTO().id);
 
-        var alteracao  = new Alteracao();
-
-        alteracao.setDelta(dto.delta);
-
-        alteracao.arte = arteRepositorio.getReferenceById(dto.arteId);
-
-        alteracao.usuario = usuarioRepositorio.getReferenceById(idUsuarioLogado);
-
-        alteracao.dataCriacao = new Date();
-
-//        alteracao = alteracaoRepositorio.save(alteracao);
-
-        dto.dataCriacao = alteracao.dataCriacao.getTime();
+        dto.dataCriacao = new Date().getTime();
 
         dto.usuarioId = idUsuarioLogado;
 

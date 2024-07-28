@@ -13,7 +13,7 @@ import { useUserId } from '../../hooks/useUserId';
 import { flushBuffer } from '../../components/whiteboard/utils/updateElement';
 import { v4 as uuid } from 'uuid';
 
-const formatDrawingData = (element, arteId, usuarioId) => {
+const getAlteracaoEntradaDtoObject = (element, arteId, usuarioId) => {
     return {
         arteId: arteId,
         usuarioId: usuarioId,
@@ -57,24 +57,32 @@ const Paint = () => {
                 socketService.subscribe(
                     `/topic/alteracoes/${salaUUID}/${idUser}`,
                     (message) => {
-                        console.log('Raw message received:', message);
 
-                        if (!message || !message.delta) {
-                            console.error(
-                                'Received a message without a delta.'
-                            );
-                            return;
+                        function desenhar(alteracao){
+                            if (!alteracao || !alteracao.delta) {
+                                console.error('Received a message without a delta.');
+                                return;
+                            }
+
+                            try {
+                                const ctx = mainCanvasRef.current.getContext('2d');
+                                drawElement({
+                                    context: ctx,
+                                    element: alteracao.delta,
+                                });
+                            } catch (error) {
+                                console.error('Erro ao obter o delta:', error);
+                            }
                         }
 
-                        try {
-                            const ctx = mainCanvasRef.current.getContext('2d');
-                            drawElement({
-                                context: ctx,
-                                element: message.delta,
-                            });
-                        } catch (error) {
-                            console.error('Erro ao obter o delta:', error);
+                        if(message["numeroLote"]){
+                            message["alteracoes"].forEach(alteracao=>{
+                                desenhar(alteracao)
+                            })
+                        }else{
+                            desenhar(message);
                         }
+
                     }
                 );
             });
@@ -109,19 +117,41 @@ const Paint = () => {
 
         const newPoint = { x: offsetX, y: offsetY };
 
-        const element = {
-            id: uuid(),
-            points: [...points, newPoint],
-            type: toolType,
-            lineWidth,
-            color,
-        };
+        let element ;
 
-        setPoints((prevPoints) => [...prevPoints, { x: offsetX, y: offsetY }]);
+        if(points.length<25){
+            element = {
+                id: uuid(),
+                points: [...points, newPoint],
+                type: toolType,
+                lineWidth,
+                color,
+            };
 
-        const formatedData = formatDrawingData(element, arteId, userId);
+            setPoints((prevPoints) => [...prevPoints, { x: offsetX, y: offsetY }]);
+        }else{
+
+            let newArr = [...(points.slice(-3)),newPoint]
+
+            element = {
+                id: uuid(),
+                points: newArr,
+                type: toolType,
+                lineWidth,
+                color,
+            };
+
+            setPoints(newArr);
+        }
+
+
+        const formatedData = getAlteracaoEntradaDtoObject(element, arteId, userId);
+
         socketService.sendElementUpdate(salaUUID, formatedData);
     };
+
+
+
 
     const handleMouseUp = (e) => {
         setIsDrawing(false);

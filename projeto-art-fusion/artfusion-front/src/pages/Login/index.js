@@ -34,6 +34,12 @@ const Login = () => {
 
     const isFormValid = email && password;
 
+    const enviarListener = async (e)=>{
+        if(e.code==="NumpadEnter" || e.code==="Enter"){
+            handleLogin(e)
+        }
+    }
+
     return (
         <C.Container>
             <C.Content>
@@ -42,24 +48,27 @@ const Login = () => {
                     <C.TitleText>ArtFusion</C.TitleText>
                 </C.ImageContainer>
                 <C.Label style={{ paddingBottom: '20px' }}>
-                    Por favor, faça login para continuar.
+                    Faça login para continuar.
                 </C.Label>
 
-                <Input
-                    type="email"
-                    placeholder={'E-mail'}
-                    value={email}
-                    onChange={(e) => [setEmail(e.target.value), setError('')]}
-                />
-                <InputPassword
-                    //type="password"
-                    placeholder={'Senha'}
-                    value={password}
-                    onChange={(e) => [
-                        setPassword(e.target.value),
-                        setError(''),
-                    ]}
-                />
+                <div style={{width:"100%"}} onKeyDown={enviarListener}>
+                    <Input
+                        type="email"
+                        placeholder={'E-mail'}
+                        value={email}
+                        onChange={(e) => [setEmail(e.target.value), setError('')]}
+                    />
+                    <div style={{width:"100%",height:"10px"}}></div>
+                    <InputPassword
+                        //type="password"
+                        placeholder={'Senha'}
+                        value={password}
+                        onChange={(e) => [
+                            setPassword(e.target.value),
+                            setError(''),
+                        ]}
+                    />
+                </div>
                 <C.LabelError>{error}</C.LabelError>
                 <Button
                     Text="Entrar"

@@ -50,7 +50,6 @@ class SocketService {
 
     sendElementUpdate(salaUUID, elementData) {
         if (this.stompClient && this.connected) {
-            console.log('Enviado:', elementData.delta);
 
             try {
                 this.stompClient.send(

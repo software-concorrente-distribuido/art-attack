@@ -1,6 +1,5 @@
 package br.ufg.artattack.amqp;
 
-import br.ufg.artattack.dto.AlteracaoSaidaDTO;
 import br.ufg.artattack.dto.SalaAbertaWrapper;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.*;
@@ -9,7 +8,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -91,7 +89,7 @@ public class ServicoRabbitMQ {
     }
 
     public String createNonDurableQueueWithPriorities(String queueName){
-        rabbitAdmin.declareQueue(QueueBuilder.nonDurable(queueName).withArgument("x-max-priority", 10).build());
+        rabbitAdmin.declareQueue(QueueBuilder.nonDurable(queueName).withArgument("x-max-priority", 2).build());
         return "Queue created: " + queueName;
     }
 
@@ -119,14 +117,20 @@ public class ServicoRabbitMQ {
         return "Message sent to exchange: " + exchangeName + " with routing key: " + routingKey;
     }
 
-    public String createConsumer(String queueName, MessageListener listenerAdapter) {
+    public String createConsumerAdapted(String queueName, MessageListenerAdapter listenerAdapter) {
+        listenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
+        return createConsumer(queueName, listenerAdapter);
+    }
 
-//        listenerAdapter.setMessageConverter(jackson2JsonMessageConverter);
-//        listenerAdapter.setMessageConverter(new SimpleMessageConverter());
+    public String createConsumerStandard(String queueName, MessageListener listener) {
+        return createConsumer(queueName, listener);
+    }
+
+    private String createConsumer(String queueName, MessageListener listener) {
         SimpleMessageListenerContainer listenerRuntime = new SimpleMessageListenerContainer();
         listenerRuntime.setConnectionFactory(rabbitAdmin.getRabbitTemplate().getConnectionFactory());
         listenerRuntime.addQueues(new Queue(queueName));
-        listenerRuntime.setMessageListener(listenerAdapter);
+        listenerRuntime.setMessageListener(listener);
         listenerRuntime.start();
 
         containers.put(queueName, listenerRuntime);

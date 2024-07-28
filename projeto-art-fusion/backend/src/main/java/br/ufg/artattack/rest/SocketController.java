@@ -62,10 +62,14 @@ public class SocketController {
 
             String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(alteracaoSaidaDTO.arteId);
 
-            rabbitTemplate.send(
+            rabbitTemplate.convertAndSend(
                     RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
                     geralBindKey,
-                    new org.springframework.amqp.core.Message(alteracaoSaidaDTO.toJsonString().getBytes())
+                    new org.springframework.amqp.core.Message(alteracaoSaidaDTO.toJsonString().getBytes()),
+                    message->{
+                        message.getMessageProperties().setPriority(0);
+                        return message;
+                    }
             );
 
         } catch (Exception e) {

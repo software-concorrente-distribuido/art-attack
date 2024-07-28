@@ -1,4 +1,4 @@
-package br.ufg.artattack.rest.middleware;
+package br.ufg.artattack.socketmiddleware;
 
 import br.ufg.artattack.dto.UsuarioDTO;
 import br.ufg.artattack.exception.ErroEsperadoException;

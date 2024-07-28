@@ -49,6 +49,8 @@ public class Sala {
             if (integrante.colaborador.id.equals(usuarioDTO.getId())) {
                 adicionar = new Integrante(usuarioDTO, permissoes);
 
+                this.integrantes.get(i).onUnsubscribe.run();
+
                 this.integrantes.set(i,adicionar);
 
                 return new AddIntegranteWrapper(adicionar,false);
@@ -78,10 +80,22 @@ public class Sala {
         return integrantes.stream().map(IntegranteDTO::new).toList();
     }
 
+    public List<Integrante> getIntegrantesSemSerDTO(){
+        return integrantes;
+    }
+
 
     public Integrante getIntegrante(Long usuarioId){
         return integrantes.stream().filter(i->i.colaborador.id.equals(usuarioId.toString())).toList().get(0);
     }
 
 
+    public Integrante obterIntegrante(String userId) {
+
+        for (Integrante integrante : this.integrantes)
+            if(integrante.colaborador.id.equals(userId))
+                return integrante;
+
+        return null;
+    }
 }

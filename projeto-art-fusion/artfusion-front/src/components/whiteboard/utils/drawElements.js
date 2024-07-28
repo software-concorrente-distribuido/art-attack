@@ -51,11 +51,13 @@ const drawPencilElement = (context, element) => {
     context.globalCompositeOperation =
         element.type === toolTypes.ERASER ? 'destination-out' : 'source-over';
 
-    console.log('CHEGOU AQUI');
 
     const myStroke = getStroke(element.points, {
         size: element.lineWidth, // Tamanho fixo para todos os pontos
         thinning: 0, // Desabilita o afinamento baseado na velocidade ou pressão
+        smoothing: 0.8,
+        streamline: 0.5,
+        simulatePressure: false
     });
 
     const pathData = getSvgPathFromStroke(myStroke);
@@ -84,7 +86,6 @@ export const drawElement = ({ context, element }) => {
             case toolTypes.PENCIL:
             case toolTypes.ERASER:
                 drawPencilElement(context, element);
-                console.log('EH PENCIL');
                 break;
             // case toolTypes.CIRCLE:
             //     drawCircle(context, element);

@@ -1,17 +1,25 @@
 package br.ufg.artattack;
 
+import br.ufg.artattack.amqp.ArteConsumer;
 import br.ufg.artattack.amqp.RabbitMQConfig;
 import br.ufg.artattack.amqp.ServicoRabbitMQ;
+import br.ufg.artattack.dto.AlteracaoSaidaDTO;
+import br.ufg.artattack.modelo.Alteracao;
 import br.ufg.artattack.modelo.Usuario;
+import br.ufg.artattack.repositorio.AlteracaoRepositorio;
 import br.ufg.artattack.repositorio.ArteRepositorio;
 import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import jakarta.annotation.PostConstruct;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 @SpringBootApplication
 @EnableScheduling
@@ -30,6 +38,9 @@ public class ArtAttackApplication {
     @Autowired
     ServicoRabbitMQ servicoRabbitMQ;
 
+    @Autowired
+    AlteracaoRepositorio alteracaoRepositorio;
+
 
     @PostConstruct
     public void gerarDados(){
@@ -44,6 +55,7 @@ public class ArtAttackApplication {
 
     }
 
+
     @PostConstruct
     public void garantirQueuesARte(){
 
@@ -53,6 +65,15 @@ public class ArtAttackApplication {
             servicoRabbitMQ.createDurableQueue(queueName);
 
             servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,ServicoRabbitMQ.getGeralBindingKey(art.getId()));
+
+            servicoRabbitMQ.stopConsumer(queueName);
+
+            servicoRabbitMQ.createConsumerStandard(queueName,new ArteConsumer(
+                    alteracaoRepositorio,
+                    arteRepositorio,
+                    usuarioRepositorio
+            ));
+
 
         });
 

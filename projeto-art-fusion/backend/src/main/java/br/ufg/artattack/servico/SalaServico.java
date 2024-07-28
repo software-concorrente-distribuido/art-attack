@@ -54,7 +54,7 @@ public class SalaServico {
     String host;
 
 
-    @Scheduled(fixedRate = 30000) // 3s em milissegundos
+    @Scheduled(fixedRate = 2*60000) // 2 minutos em milissegundos
     public void limparSalasOciosas() throws URISyntaxException, JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -66,7 +66,6 @@ public class SalaServico {
 
         var urlBuilder = new StringBuilder().append("http://").append(host).append(":").append("15672").append("/api/queues/%2F/");
 
-//        String url = "http://localhost:15672/api/queues/%2F/";
 
         restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor(username, password));
 
@@ -74,37 +73,42 @@ public class SalaServico {
 
         for (Map.Entry<String, Sala> par : salas.entrySet()) {
 
-            String arteQueueName = ServicoRabbitMQ.getArteQueueName(par.getValue().arte.id);
+            List<String> queues = par.getValue().getIntegrantes().stream().map(
+                    integranteDTO -> ServicoRabbitMQ.getSalaUsuarioQueueName(par.getKey(),integranteDTO.colaborador.id)).toList();
 
-            ResponseEntity<String> response = restTemplate.exchange(new URI(urlBuilder+arteQueueName), HttpMethod.GET, entity, String.class);
+            queues.forEach(usuarioQueue->{
+                String ideSince = "";
+                try{
+                    ResponseEntity<String> response = restTemplate.exchange(new URI(urlBuilder+usuarioQueue), HttpMethod.GET, entity, String.class);
 
-            JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
+                    JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
 
-            var ideSince = jsonNode.get("idle_since").toString();
+                    ideSince = jsonNode.get("idle_since").toString();
 
-            if(ideSince==null){
-                return;
-            }
+                    if(ideSince==null){
+                        return;
+                    }
+                }catch (Exception e){
+                    return;
+                }
 
-            ideSince = ideSince.replace("\"","");
+                ideSince = ideSince.replace("\"","");
 
-            var instanteParado = LocalDateTime.parse(ideSince, DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
+                var instanteParado = LocalDateTime.parse(ideSince, DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
 
-            var agora = LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo"));
+                var agora = LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo"));
 
-            if(Duration.between(instanteParado,agora).toSeconds() >120 ){
+                if(Duration.between(instanteParado,agora).toSeconds() >600 ){
 
-                for (IntegranteDTO integrante : par.getValue().getIntegrantes()) {
+                    for (Integrante integrante : par.getValue().getIntegrantesSemSerDTO()) {
 
-                    String salaUsuarioQueueName= ServicoRabbitMQ.getSalaUsuarioQueueName(par.getKey(),integrante.colaborador.id);
-                    servicoRabbitMQ.stopConsumer(salaUsuarioQueueName);
-                    servicoRabbitMQ.deleteQueue(salaUsuarioQueueName);
-                    servicoRabbitMQ.purgeQueue(salaUsuarioQueueName);
+                        integrante.onUnsubscribe.run();
+
+                    }
+                    uuids.add(par.getKey());
 
                 }
-                uuids.add(par.getKey());
-
-            }
+            });
         }
 
         for (String uuid : uuids) {
