@@ -113,10 +113,37 @@ class ApiServices {
     }
 
 
+    static async obterSala(salaUUID) {
+        try {
+            const response = await api.get(`/sala/obter/${salaUUID}`,{
+                headers : {
+                    Authorization : `Bearer ${Cookies.get('user_token')}`
+                }
+            });
 
+            return response.data; // Retorna a sala
+        } catch (error) {
+            return "..."
+        }
+    }
 
+    static async editarTitulo(nome,arteId) {
 
+        try {
+            const response = await api.post(`/arte/editarTitulo`,{
+                titulo : nome,
+                arteId: arteId
+            },{
+                headers : {
+                    Authorization : `Bearer ${Cookies.get('user_token')}`
+                }
+            });
+            return response.data; // Retorna a sala
+        } catch (error) {
+            return "..."
+        }
 
+    }
 }
 
 export default ApiServices;

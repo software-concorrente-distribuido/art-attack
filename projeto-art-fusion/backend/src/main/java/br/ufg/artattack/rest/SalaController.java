@@ -20,12 +20,15 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.stream.IntStream;
 
 @RestController()
 @RequestMapping("api/sala")
 public class SalaController {
 
+    private final ConcurrentHashMap<Long, Semaphore> semaphoreMap = new ConcurrentHashMap<>();
 
     @Autowired
     ArteServico arteServico;
@@ -52,69 +55,86 @@ public class SalaController {
     @PostMapping("/abrir")
     public ResponseEntity<Sala> abrirSala(@RequestBody AbrirSalaDTO abrirSalaDTO) throws Exception {
 
-        SalaAbertaWrapper salaAbertaWrapper = salaServico.abrirSala(abrirSalaDTO.arteId);
+        Long arteId = abrirSalaDTO.arteId;
 
-        String salaUsuarioQueueName = ServicoRabbitMQ.getSalaUsuarioQueueName(salaAbertaWrapper.salaNova.uuid,salaAbertaWrapper.integranteRequerinte.colaborador.id);
+        semaphoreMap.putIfAbsent(arteId, new Semaphore(1));
 
-        String especificoBindingKey = ServicoRabbitMQ.getEspecificoBindingKey(salaAbertaWrapper);
+        Semaphore semaphore = semaphoreMap.get(arteId);
 
-        String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(salaAbertaWrapper.salaNova.arte.id);
+        semaphore.acquire();
+        try{
 
-        //fila do usuario
-        servicoRabbitMQ.createNonDurableQueueWithPriorities(salaUsuarioQueueName);
+            SalaAbertaWrapper salaAbertaWrapper = salaServico.abrirSala(abrirSalaDTO.arteId);
 
-        //possibilidade de recepcionar mensagnes específicas pela especificoBindingKey
-        servicoRabbitMQ.bindQueue(salaUsuarioQueueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, especificoBindingKey);
+            String salaUsuarioQueueName = ServicoRabbitMQ.getSalaUsuarioQueueName(salaAbertaWrapper.salaNova.uuid,salaAbertaWrapper.integranteRequerinte.colaborador.id);
 
-        //possibilidade de recepcionar mensagnes gerais pela chave geral
-        servicoRabbitMQ.bindQueue(salaUsuarioQueueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey);
+            String especificoBindingKey = ServicoRabbitMQ.getEspecificoBindingKey(salaAbertaWrapper);
 
-        /*
-        Cria consumidor da fila do usuário.
-        Este será responsável por retornar informações ao cliente por meio da binding key geral.
-        */
-        salaAbertaWrapper.integranteRequerinte.onSubscribe = ()->{
+            String geralBindKey = ServicoRabbitMQ.getGeralBindingKey(salaAbertaWrapper.salaNova.arte.id);
 
-            salaAbertaWrapper.integranteRequerinte.isInscrito = true;
+            //fila do usuario
+            servicoRabbitMQ.createNonDurableQueueWithPriorities(salaUsuarioQueueName);
 
-            List<Alteracao> alteracoes = alteracaoRepositorio.findAlteracaoByArte_Id(salaAbertaWrapper.salaNova.arte.id);
+            //possibilidade de recepcionar mensagnes específicas pela especificoBindingKey
+            servicoRabbitMQ.bindQueue(salaUsuarioQueueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, especificoBindingKey);
 
-            var containers = groupArray(alteracoes.stream().map(AlteracaoSaidaDTO::new).toList(),1500);
+            //possibilidade de recepcionar mensagnes gerais pela chave geral
+            servicoRabbitMQ.bindQueue(salaUsuarioQueueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME, geralBindKey);
 
-            containers.forEach(container->{
+            /*
+            Cria consumidor da fila do usuário.
+            Este será responsável por retornar informações ao cliente por meio da binding key geral.
+            */
+            salaAbertaWrapper.integranteRequerinte.onSubscribe = ()->{
 
-                try {
+                salaAbertaWrapper.integranteRequerinte.isInscrito = true;
 
-                    servicoRabbitMQ.getRabbitTemplate().convertAndSend(
-                            RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
-                            especificoBindingKey,
-                            new Message(new ObjectMapper().writeValueAsString(container).getBytes()),
-                            msg->{
-                                msg.getMessageProperties().setPriority(2);
-                                return msg;
-                            }
-                    );
-                } catch (JsonProcessingException e) {
-                    //skip
-                }
+                List<Alteracao> alteracoes = alteracaoRepositorio.findAlteracaoByArte_Id(salaAbertaWrapper.salaNova.arte.id);
 
-            });
+                var containers = groupArray(alteracoes.stream().map(AlteracaoSaidaDTO::new).toList(),1500);
 
-            servicoRabbitMQ.createConsumerStandard(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper,simpMessagingTemplate));
+                containers.forEach(container->{
 
-        };
+                    try {
 
-        salaAbertaWrapper.integranteRequerinte.onUnsubscribe = ()->{
-            salaAbertaWrapper.integranteRequerinte.isInscrito = false;
-            servicoRabbitMQ.stopConsumer(salaUsuarioQueueName);
-            servicoRabbitMQ.purgeQueue(salaUsuarioQueueName);
-            servicoRabbitMQ.deleteQueue(salaUsuarioQueueName);
-        };
+                        servicoRabbitMQ.getRabbitTemplate().convertAndSend(
+                                RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
+                                especificoBindingKey,
+                                new Message(new ObjectMapper().writeValueAsString(container).getBytes()),
+                                msg->{
+                                    msg.getMessageProperties().setPriority(2);
+                                    return msg;
+                                }
+                        );
+                    } catch (JsonProcessingException e) {
+                        //skip
+                    }
+
+                });
+
+                servicoRabbitMQ.createConsumerStandard(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper,simpMessagingTemplate));
+
+            };
+
+            salaAbertaWrapper.integranteRequerinte.onUnsubscribe = ()->{
+                salaAbertaWrapper.integranteRequerinte.isInscrito = false;
+                servicoRabbitMQ.stopConsumer(salaUsuarioQueueName);
+                servicoRabbitMQ.purgeQueue(salaUsuarioQueueName);
+                servicoRabbitMQ.deleteQueue(salaUsuarioQueueName);
+            };
 
 
 
-        return ResponseEntity.ok(salaAbertaWrapper.salaNova);
+            return ResponseEntity.ok(salaAbertaWrapper.salaNova);
 
+        }catch (Exception e){
+
+            throw new Exception(e);
+
+        }finally {
+            semaphore.release();
+            semaphoreMap.remove(arteId, semaphore); // Descomente se desejar remover o semáforo
+        }
     }
 
     public static List<AlteracaoContainerDTO> groupArray(List<AlteracaoSaidaDTO> list, int groupSize) {
@@ -144,6 +164,7 @@ public class SalaController {
         return ResponseEntity.ok(salaServico.fecharSala(uuid));
 
     }
+
 
 
 

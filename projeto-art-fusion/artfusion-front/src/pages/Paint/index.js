@@ -12,6 +12,7 @@ import { updateElement } from '../../components/whiteboard/utils/updateElement';
 import { useUserId } from '../../hooks/useUserId';
 import { flushBuffer } from '../../components/whiteboard/utils/updateElement';
 import { v4 as uuid } from 'uuid';
+import apiServices from "../../services/apiServices";
 
 const getAlteracaoEntradaDtoObject = (element, arteId, usuarioId) => {
     return {
@@ -26,6 +27,7 @@ const Paint = () => {
     const [isDrawing, setIsDrawing] = useState(false);
     const [points, setPoints] = useState([]);
     const { arteId, salaUUID } = useParams();
+    const [title,setTitle] = useState("Sem título");
     const toolType = useSelector((state) => state.whiteboard.tool);
     const lineWidth = useSelector((state) => state.whiteboard.lineWidth);
     const color = useSelector((state) => state.whiteboard.color);
@@ -35,6 +37,9 @@ const Paint = () => {
         const token = Cookies.get('user_token');
 
         if (token) {
+
+            carregarTituloArte();
+
             setupSocket(token);
         } else {
             console.error('JWT token não encontrado.');
@@ -45,15 +50,23 @@ const Paint = () => {
         };
     }, [salaUUID]);
 
+    async function carregarTituloArte(){
+        const data = await apiServices.obterSala(salaUUID);
+        setTitle(data.titulo);
+    }
+
+    async function editarTitulo(nome,arteId){
+        const data = await apiServices.editarTitulo(nome,arteId);
+        setTitle(data.titulo)
+    }
+
     const setupSocket = (token) => {
         if (salaUUID) {
             socketService.connect(() => {
                 let payload = jwtDecode(token);
                 let usuario = JSON.parse(payload.usuario);
                 const idUser = usuario.id;
-                console.log(
-                    `SE INSCREVENDO EM /topic/alteracoes/${salaUUID}/${idUser}`
-                );
+
                 socketService.subscribe(
                     `/topic/alteracoes/${salaUUID}/${idUser}`,
                     (message) => {
@@ -164,7 +177,7 @@ const Paint = () => {
 
     return (
         <div>
-            <Header />
+            <Header title={title} setTitle={setTitle} editarTitulo={editarTitulo} arteId = {arteId}/>
             <Sidebar />
             <canvas
                 ref={mainCanvasRef}

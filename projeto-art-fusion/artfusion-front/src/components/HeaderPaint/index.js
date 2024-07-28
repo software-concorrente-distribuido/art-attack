@@ -3,10 +3,10 @@ import { FaPencilAlt, FaUndo, FaRedo, FaSave } from 'react-icons/fa';
 import * as S from './styles';
 import logo from '../../assets/images/logo.png';
 import ShareModal from '../../modals/ShareModal/';
+import apiServices from "../../services/apiServices";
 
-const Header = ({ onUndo, onRedo }) => {
+const Header = ({ onUndo, onRedo, title,setTitle ,editarTitulo, arteId}) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [title, setTitle] = useState('Obra sem título');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const maxLength = 45;
 
@@ -14,7 +14,7 @@ const Header = ({ onUndo, onRedo }) => {
         setIsEditing(true);
     };
 
-    const handleTitleChange = (e) => {
+    const handleTitleChange = async (e) => {
         setTitle(e.target.value);
     };
 
@@ -26,12 +26,15 @@ const Header = ({ onUndo, onRedo }) => {
         setIsModalOpen(false);
     };
 
-    const handleTitleBlur = () => {
+    const handleTitleBlur = async () => {
         if (title.trim() === '') {
             setTitle('Obra sem título');
         }
+        await editarTitulo(title,arteId)
+
         setIsEditing(false);
     };
+
 
     return (
         <>
@@ -56,6 +59,7 @@ const Header = ({ onUndo, onRedo }) => {
                 </S.LeftSection>
                 <S.RightSection>
                     {/* <S.UserAvatar>K</S.UserAvatar> */}
+
                     <S.ShareButton onClick={handleShareClick}>
                         Compartilhar
                     </S.ShareButton>
