@@ -51,6 +51,8 @@ const drawPencilElement = (context, element) => {
     context.globalCompositeOperation =
         element.type === toolTypes.ERASER ? 'destination-out' : 'source-over';
 
+    console.log('CHEGOU AQUI');
+
     const myStroke = getStroke(element.points, {
         size: element.lineWidth, // Tamanho fixo para todos os pontos
         thinning: 0, // Desabilita o afinamento baseado na velocidade ou pressão
@@ -61,17 +63,6 @@ const drawPencilElement = (context, element) => {
     const myPath = new Path2D(pathData);
     context.fillStyle = element.color;
     context.fill(myPath);
-};
-
-const drawSprayElement = (context, element) => {
-    context.fillStyle = element.color;
-    context.globalAlpha = 0.5;
-
-    element.sprayPoints.forEach((point) => {
-        context.fillRect(point.x, point.y, 1, 1);
-    });
-
-    context.globalAlpha = 1.0;
 };
 
 export const drawElement = ({ context, element }) => {
@@ -93,18 +84,16 @@ export const drawElement = ({ context, element }) => {
             case toolTypes.PENCIL:
             case toolTypes.ERASER:
                 drawPencilElement(context, element);
+                console.log('EH PENCIL');
                 break;
-            case toolTypes.SPRAY:
-                drawSprayElement(context, element);
-                break;
-            case toolTypes.CIRCLE:
-                drawCircle(context, element);
-                break;
-            case toolTypes.TRIANGLE:
-                drawTriangle(context, element);
-                break;
+            // case toolTypes.CIRCLE:
+            //     drawCircle(context, element);
+            //     break;
+            // case toolTypes.TRIANGLE:
+            //     drawTriangle(context, element);
+            //     break;
             default:
-                throw new Error('Algo deu erado ao desenhar o elemento');
+                throw new Error('Algo deu errado ao desenhar o elemento');
         }
     } catch (error) {
         console.error(error);
