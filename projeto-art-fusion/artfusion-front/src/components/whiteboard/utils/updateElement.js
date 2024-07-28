@@ -16,7 +16,7 @@ const formatDrawingData = (element, arteId, usuarioId) => {
 };
 
 const buffer = {};
-const BUFFER_LIMIT = 1;
+const BUFFER_LIMIT = 5;
 
 export const flushBuffer = (salaUUID, arteId, userId, forceFlush = false) => {
     Object.keys(buffer).forEach((id) => {
@@ -33,10 +33,11 @@ export const flushBuffer = (salaUUID, arteId, userId, forceFlush = false) => {
                 color: buffer[id].color,
             };
 
-            socketService.sendElementUpdate(
-                salaUUID,
-                formatDrawingData(element, arteId, userId)
-            );
+            const formatedData = formatDrawingData(element, arteId, userId);
+
+            console.log('DATAAAA', formatedData);
+
+            socketService.sendElementUpdate(salaUUID, formatedData);
 
             if (buffer[id].points.length === 0) {
                 delete buffer[id];
@@ -46,101 +47,18 @@ export const flushBuffer = (salaUUID, arteId, userId, forceFlush = false) => {
 };
 
 export const updateElement = (
-    { id, x1, x2, y1, y2, type, index, lineWidth, color },
-    elements,
+    { id, points, type, lineWidth, color },
     userId,
     arteId,
     salaUUID
 ) => {
-    const elementsCopy = [...elements];
-
-    try {
-        switch (type) {
-            case toolTypes.ERASER:
-            case toolTypes.PENCIL:
-                const newPoint = { x: x2, y: y2 };
-                if (!buffer[id]) {
-                    buffer[id] = { points: [], lineWidth, color, type };
-                }
-                buffer[id].points.push(newPoint);
-
-                if (buffer[id].points.length >= BUFFER_LIMIT) {
-                    flushBuffer(salaUUID, arteId, userId);
-                }
-
-                // elementsCopy[index] = {
-                //     ...elementsCopy[index],
-                //     points: [
-                //         ...elementsCopy[index].points,
-                //         {
-                //             x: x2,
-                //             y: y2,
-                //         },
-                //     ],
-                // };
-                // store.dispatch(setElements(elementsCopy));
-                break;
-            case toolTypes.CIRCLE:
-                // Calcular o raio com base nos novos x2 e y2
-                const dx = x2 - x1;
-                const dy = y2 - y1;
-                const radius = Math.sqrt(dx * dx + dy * dy);
-                console.log('raio no update element', radius, x1, x2, y1, y2);
-
-                const updatedCircleElement = createElement({
-                    id,
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    toolType: type,
-                    lineWidth,
-                    color: elementsCopy[index].color,
-                    radius, // Adiciona o raio ao elemento
-                });
-
-                // elementsCopy[index] = updatedCircleElement;
-
-                // store.dispatch(setElements(elementsCopy));
-
-                socketService.sendElementUpdate(
-                    salaUUID,
-                    formatDrawingData(updatedCircleElement, arteId, userId)
-                );
-                break;
-            case toolTypes.TRIANGLE:
-            case toolTypes.LINE:
-            case toolTypes.SQUARE:
-                const updatedElement = createElement({
-                    id,
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    fromSocket: false,
-                    toolType: type,
-                    lineWidth: elementsCopy[index].lineWidth,
-                    color: elementsCopy[index].color,
-                });
-
-                // elementsCopy[index] = updatedElement;
-
-                // store.dispatch(setElements(elementsCopy));
-
-                socketService.sendElementUpdate(
-                    salaUUID,
-                    formatDrawingData(updatedElement, arteId, userId)
-                );
-                break;
-            default:
-                throw new Error('Algo deu errado ao atualizar o elemento');
-        }
-    } catch (error) {
-        console.error(error);
-        return null;
+    console.log('AQUI');
+    if (!buffer[id]) {
+        buffer[id] = { points: [], lineWidth, color, type };
     }
-};
+    buffer[id].points.push(...points);
 
-export const flushAllBuffers = (salaUUID, arteId, userId) => {
-    flushBuffer(salaUUID, arteId, userId, true);
+    if (buffer[id].points.length >= BUFFER_LIMIT) {
+        flushBuffer(salaUUID, arteId, userId);
+    }
 };
