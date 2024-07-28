@@ -20,7 +20,7 @@ import {
     setColor,
 } from '../whiteboard/whiteboardSlice';
 
-const lineWidths = [1, 2, 3, 4, 5, 10, 20];
+const lineWidths = [1, 2, 3, 4, 5, 10, 20,60];
 
 const colors = [
     '#ff0000',
