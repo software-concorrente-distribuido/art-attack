@@ -3,6 +3,9 @@
 ## Diagramas
 [CLIQUE AQUI](https://drive.google.com/file/d/1nSkpeHJiGiVqusFc7uL7A-Jva1d9B7br/view?usp=sharing)
 
+## Software Design Document
+[CLIQUE AQUI](https://docs.google.com/document/d/1geOp2d0BULVQ4s8E5dZOnip0_Pg6LtLSr_oZa_zrrno/edit?usp=sharing)
+
 
 ### Rodar backend:
 
