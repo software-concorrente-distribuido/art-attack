@@ -62,6 +62,7 @@ public class SalaController {
         Semaphore semaphore = semaphoreMap.get(arteId);
 
         semaphore.acquire();
+
         try{
 
             SalaAbertaWrapper salaAbertaWrapper = salaServico.abrirSala(abrirSalaDTO.arteId);
@@ -96,7 +97,6 @@ public class SalaController {
                 containers.forEach(container->{
 
                     try {
-
                         servicoRabbitMQ.getRabbitTemplate().convertAndSend(
                                 RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
                                 especificoBindingKey,
@@ -112,7 +112,7 @@ public class SalaController {
 
                 });
 
-                servicoRabbitMQ.createConsumerStandard(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper,simpMessagingTemplate));
+                servicoRabbitMQ.createConsumer(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper,simpMessagingTemplate));
 
             };
 
@@ -164,22 +164,5 @@ public class SalaController {
         return ResponseEntity.ok(salaServico.fecharSala(uuid));
 
     }
-
-
-
-
-        /*
-        Cria consumidor da fila da arte.
-        Este será responsável por enviar todas as alterações da fila da arte para o usuário por meio da binding key específica.
-         */
-/*
-//            servicoRabbitMQ.createReadOnlyConsumer(queueArte,
-//                    new AbrirSalaConsumidor(
-//                            RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
-//                            especificoBindingKey,
-//                            servicoRabbitMQ)
-//            );
- */
-
 
 }

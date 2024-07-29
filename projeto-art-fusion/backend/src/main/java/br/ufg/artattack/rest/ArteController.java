@@ -1,7 +1,6 @@
 package br.ufg.artattack.rest;
 
 import br.ufg.artattack.dto.*;
-import br.ufg.artattack.amqp.RabbitMQConfig;
 import br.ufg.artattack.amqp.ServicoRabbitMQ;
 import br.ufg.artattack.dto.ArteDTO;
 import br.ufg.artattack.dto.CompartilhamentoEntradaDTO;
@@ -41,11 +40,7 @@ public class ArteController {
 
         ArteDTO art = arteServico.criarArteDoUsuarioLogado(arteDTO);
 
-        String queueName = servicoRabbitMQ.getArteQueueName(art.id);
-
-        servicoRabbitMQ.createDurableQueue(queueName);
-
-        servicoRabbitMQ.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,art.id.toString()+".geral");
+        servicoRabbitMQ.createArteQueueAndConsumer(art.id);
 
         return ResponseEntity.ok(art);
     }

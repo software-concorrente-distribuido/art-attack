@@ -53,9 +53,10 @@ public class WebConfigurantions {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        String ip = "18.228.226.210";
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedOrigin("http://52.67.57.216:8089");
+        configuration.addAllowedOrigin("http://"+ip+":8089");
         for (HttpMethod value : HttpMethod.values()) {
             configuration.addAllowedMethod(value);
         }

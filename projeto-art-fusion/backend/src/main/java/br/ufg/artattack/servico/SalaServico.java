@@ -54,7 +54,7 @@ public class SalaServico {
     String host;
 
 
-    @Scheduled(fixedRate = 2*60000) // 2 minutos em milissegundos
+    @Scheduled(fixedRate = 20*60*1000) // 20 minutos em milissegundos
     public void limparSalasOciosas() throws URISyntaxException, JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -98,7 +98,7 @@ public class SalaServico {
 
                 var agora = LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo"));
 
-                if(Duration.between(instanteParado,agora).toSeconds() >600 ){
+                if(Duration.between(instanteParado,agora).toSeconds() >(60*60) /*1 hora*/ ){
 
                     for (Integrante integrante : par.getValue().getIntegrantesSemSerDTO()) {
 

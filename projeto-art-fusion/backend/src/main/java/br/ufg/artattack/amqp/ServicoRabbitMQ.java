@@ -1,13 +1,14 @@
 package br.ufg.artattack.amqp;
 
 import br.ufg.artattack.dto.SalaAbertaWrapper;
+import br.ufg.artattack.repositorio.AlteracaoRepositorio;
+import br.ufg.artattack.repositorio.ArteRepositorio;
+import br.ufg.artattack.repositorio.UsuarioRepositorio;
 import com.rabbitmq.client.Channel;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,15 +27,38 @@ public class ServicoRabbitMQ {
     @Autowired
     private SimpleMessageListenerContainer listenerContainer;
 
-//
-//    @Autowired
-//    private Jackson2JsonMessageConverter jackson2JsonMessageConverter;
-
     @Autowired
     private Channel channel;
 
+    @Autowired
+    UsuarioRepositorio usuarioRepositorio;
+
+    @Autowired
+    ArteRepositorio arteRepositorio;
+
+    @Autowired
+    AlteracaoRepositorio alteracaoRepositorio;
+
 
     private final Map<String, SimpleMessageListenerContainer> containers = new HashMap<>();
+
+    public void createArteQueueAndConsumer(Long arteId){
+
+        String queueName = ServicoRabbitMQ.getArteQueueName(arteId);
+
+        this.createDurableQueue(queueName);
+
+        this.bindQueue(queueName, RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,ServicoRabbitMQ.getGeralBindingKey(arteId));
+
+        this.stopConsumer(queueName);
+
+        this.createConsumer(queueName,new ArteConsumer(
+                alteracaoRepositorio,
+                arteRepositorio,
+                usuarioRepositorio
+        ));
+
+    }
 
 
     public static String getGeralBindingKey(Long arteId){
@@ -117,16 +141,8 @@ public class ServicoRabbitMQ {
         return "Message sent to exchange: " + exchangeName + " with routing key: " + routingKey;
     }
 
-    public String createConsumerAdapted(String queueName, MessageListenerAdapter listenerAdapter) {
-        listenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
-        return createConsumer(queueName, listenerAdapter);
-    }
 
-    public String createConsumerStandard(String queueName, MessageListener listener) {
-        return createConsumer(queueName, listener);
-    }
-
-    private String createConsumer(String queueName, MessageListener listener) {
+    public String createConsumer(String queueName, MessageListener listener) {
         SimpleMessageListenerContainer listenerRuntime = new SimpleMessageListenerContainer();
         listenerRuntime.setConnectionFactory(rabbitAdmin.getRabbitTemplate().getConnectionFactory());
         listenerRuntime.addQueues(new Queue(queueName));
@@ -137,6 +153,7 @@ public class ServicoRabbitMQ {
 
         return "Consumer created for queue: " + queueName;
     }
+
 
     public void stopConsumer(String queueName) {
         SimpleMessageListenerContainer container = containers.get(queueName);
