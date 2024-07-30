@@ -53,7 +53,7 @@ public class SalaServico {
     @Value("${spring.rabbitmq.host}")
     String host;
 
-
+    //test: a cada segundo
     @Scheduled(fixedRate = 20*60*1000) // 20 minutos em milissegundos
     public void limparSalasOciosas() throws URISyntaxException, JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
@@ -97,7 +97,7 @@ public class SalaServico {
                 var instanteParado = LocalDateTime.parse(ideSince, DateTimeFormatter.ISO_ZONED_DATE_TIME).atZone(ZoneId.of("UTC"));
 
                 var agora = LocalDateTime.now().atZone(ZoneId.of("America/Sao_Paulo"));
-
+                //test: excluir salas ide por 20 segundos
                 if(Duration.between(instanteParado,agora).toSeconds() >(60*60) /*1 hora*/ ){
 
                     for (Integrante integrante : par.getValue().getIntegrantesSemSerDTO()) {

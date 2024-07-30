@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -88,31 +89,48 @@ public class SalaController {
             */
             salaAbertaWrapper.integranteRequerinte.onSubscribe = ()->{
 
+                Long qntdAlteracao = alteracaoRepositorio.countAlteracaoByArteId(salaAbertaWrapper.salaNova.arte.id);
+
                 salaAbertaWrapper.integranteRequerinte.isInscrito = true;
 
-                List<Alteracao> alteracoes = alteracaoRepositorio.findAlteracaoByArte_Id(salaAbertaWrapper.salaNova.arte.id);
+                // Definindo os tamanhos dos grupos
+                int mainGroupSize = 7500;
+                int subGroupSize = 1500;
 
-                var containers = groupArray(alteracoes.stream().map(AlteracaoSaidaDTO::new).toList(),1500);
+                final boolean[] consumerCriado = {false};
 
-                containers.forEach(container->{
+                // Processar em lotes de 15 mil
+                for (int i = 0,j=0; i < qntdAlteracao; i += mainGroupSize,j++) {
+                    // Obter um grupo de 15 mil alterações
+                    List<Alteracao> alteracoes = alteracaoRepositorio.findAlteracaoByArte_IdOrderByDataCriacao(salaAbertaWrapper.salaNova.arte.id, PageRequest.of(
+                            j,mainGroupSize
+                    ));
 
-                    try {
-                        servicoRabbitMQ.getRabbitTemplate().convertAndSend(
-                                RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
-                                especificoBindingKey,
-                                new Message(new ObjectMapper().writeValueAsString(container).getBytes()),
-                                msg->{
-                                    msg.getMessageProperties().setPriority(2);
-                                    return msg;
-                                }
-                        );
-                    } catch (JsonProcessingException e) {
-                        //skip
-                    }
+                    // Converter para AlteracaoSaidaDTO e agrupar em subgrupos de 1500
+                    var subGroups = groupArray(alteracoes.stream().map(AlteracaoSaidaDTO::new).toList(), subGroupSize);
 
-                });
+                    subGroups.forEach(subGroup -> {
+                        try {
+                            servicoRabbitMQ.getRabbitTemplate().convertAndSend(
+                                    RabbitMQConfig.ALTERACOES_EXCHANGE_NAME,
+                                    especificoBindingKey,
+                                    new Message(new ObjectMapper().writeValueAsString(subGroup).getBytes()),
+                                    msg -> {
+                                        msg.getMessageProperties().setPriority(2);
+                                        return msg;
+                                    }
+                            );
 
-                servicoRabbitMQ.createConsumer(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper,simpMessagingTemplate));
+                            if (!consumerCriado[0]) {
+                                servicoRabbitMQ.createConsumer(salaUsuarioQueueName, new UserConsumer(salaAbertaWrapper, simpMessagingTemplate));
+                                consumerCriado[0] = true;
+                            }
+
+                        } catch (JsonProcessingException e) {
+                            // Log or handle exception as needed
+                        }
+                    });
+                }
 
             };
 
