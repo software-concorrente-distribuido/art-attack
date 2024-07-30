@@ -197,10 +197,10 @@ const Paint = () => {
                 style={{
                     marginLeft: '60px',
                     marginTop: '60px',
-                    backgroundColor: 'transparent',
+                    backgroundColor: '#fff',
                     position: 'absolute',
                     pointerEvents: 'auto',
-                    zIndex: 0,
+                    zIndex: 0, // previewCanvasRef fica abaixo, usado para desenhos temporários/local
                 }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
@@ -214,7 +214,7 @@ const Paint = () => {
                 style={{
                     marginLeft: '60px',
                     marginTop: '60px',
-                    backgroundColor: '#fff',
+                    backgroundColor: 'transparent',
                     position: 'absolute',
                     pointerEvents: 'none',
                     zIndex: 1,
