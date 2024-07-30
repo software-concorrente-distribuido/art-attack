@@ -12,7 +12,7 @@ import { updateElement } from '../../components/whiteboard/utils/updateElement';
 import { useUserId } from '../../hooks/useUserId';
 import { flushBuffer } from '../../components/whiteboard/utils/updateElement';
 import { v4 as uuid } from 'uuid';
-import apiServices from "../../services/apiServices";
+import apiServices from '../../services/apiServices';
 
 const getAlteracaoEntradaDtoObject = (element, arteId, usuarioId) => {
     return {
@@ -24,10 +24,11 @@ const getAlteracaoEntradaDtoObject = (element, arteId, usuarioId) => {
 
 const Paint = () => {
     const mainCanvasRef = useRef(null);
+    const previewCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [points, setPoints] = useState([]);
     const { arteId, salaUUID } = useParams();
-    const [title,setTitle] = useState("Sem título");
+    const [title, setTitle] = useState('Sem título');
     const toolType = useSelector((state) => state.whiteboard.tool);
     const lineWidth = useSelector((state) => state.whiteboard.lineWidth);
     const color = useSelector((state) => state.whiteboard.color);
@@ -37,7 +38,6 @@ const Paint = () => {
         const token = Cookies.get('user_token');
 
         if (token) {
-
             carregarTituloArte();
 
             setupSocket(token);
@@ -50,14 +50,14 @@ const Paint = () => {
         };
     }, [salaUUID]);
 
-    async function carregarTituloArte(){
+    async function carregarTituloArte() {
         const data = await apiServices.obterSala(salaUUID);
         setTitle(data.titulo);
     }
 
-    async function editarTitulo(nome,arteId){
-        const data = await apiServices.editarTitulo(nome,arteId);
-        setTitle(data.titulo)
+    async function editarTitulo(nome, arteId) {
+        const data = await apiServices.editarTitulo(nome, arteId);
+        setTitle(data.titulo);
     }
 
     const setupSocket = (token) => {
@@ -70,15 +70,16 @@ const Paint = () => {
                 socketService.subscribe(
                     `/topic/alteracoes/${salaUUID}/${idUser}`,
                     (message) => {
-
-                        function desenhar(alteracao){
+                        function desenhar(alteracao) {
                             if (!alteracao || !alteracao.delta) {
-                                console.error('Received a message without a delta.');
+                                console.error(
+                                    'Received a message without a delta.'
+                                );
                                 return;
                             }
-
                             try {
-                                const ctx = mainCanvasRef.current.getContext('2d');
+                                const ctx =
+                                    mainCanvasRef.current.getContext('2d');
                                 drawElement({
                                     context: ctx,
                                     element: alteracao.delta,
@@ -87,15 +88,13 @@ const Paint = () => {
                                 console.error('Erro ao obter o delta:', error);
                             }
                         }
-
-                        if(message["numeroLote"]){
-                            message["alteracoes"].forEach(alteracao=>{
-                                desenhar(alteracao)
-                            })
-                        }else{
+                        if (message['numeroLote']) {
+                            message['alteracoes'].forEach((alteracao) => {
+                                desenhar(alteracao);
+                            });
+                        } else {
                             desenhar(message);
                         }
-
                     }
                 );
             });
@@ -111,13 +110,13 @@ const Paint = () => {
         setIsDrawing(true);
         setPoints([{ x: offsetX, y: offsetY }]);
 
-        const mainCanvas = mainCanvasRef.current;
-        const mainContext = mainCanvas.getContext('2d');
+        const previewCanvas = previewCanvasRef.current;
+        const previewContext = previewCanvas.getContext('2d');
 
-        mainContext.strokeStyle = color;
-        mainContext.lineWidth = lineWidth;
-        mainContext.beginPath();
-        mainContext.moveTo(offsetX, offsetY);
+        previewContext.strokeStyle = color;
+        previewContext.lineWidth = lineWidth;
+        previewContext.beginPath();
+        previewContext.moveTo(offsetX, offsetY);
     };
 
     const handleMouseMove = (e) => {
@@ -125,14 +124,14 @@ const Paint = () => {
 
         const { offsetX, offsetY } = e.nativeEvent;
 
-        const mainCanvas = mainCanvasRef.current;
-        const mainContext = mainCanvas.getContext('2d');
+        const previewCanvas = previewCanvasRef.current;
+        const previewContext = previewCanvas.getContext('2d');
 
         const newPoint = { x: offsetX, y: offsetY };
 
-        let element ;
+        let element;
 
-        if(points.length<25){
+        if (points.length < 25) {
             element = {
                 id: uuid(),
                 points: [...points, newPoint],
@@ -141,10 +140,12 @@ const Paint = () => {
                 color,
             };
 
-            setPoints((prevPoints) => [...prevPoints, { x: offsetX, y: offsetY }]);
-        }else{
-
-            let newArr = [...(points.slice(-3)),newPoint]
+            setPoints((prevPoints) => [
+                ...prevPoints,
+                { x: offsetX, y: offsetY },
+            ]);
+        } else {
+            let newArr = [...points.slice(-3), newPoint];
 
             element = {
                 id: uuid(),
@@ -157,14 +158,19 @@ const Paint = () => {
             setPoints(newArr);
         }
 
+        drawElement({
+            context: previewContext,
+            element: element,
+        });
 
-        const formatedData = getAlteracaoEntradaDtoObject(element, arteId, userId);
+        const formatedData = getAlteracaoEntradaDtoObject(
+            element,
+            arteId,
+            userId
+        );
 
         socketService.sendElementUpdate(salaUUID, formatedData);
     };
-
-
-
 
     const handleMouseUp = (e) => {
         setIsDrawing(false);
@@ -177,8 +183,30 @@ const Paint = () => {
 
     return (
         <div>
-            <Header title={title} setTitle={setTitle} editarTitulo={editarTitulo} arteId = {arteId}/>
+            <Header
+                title={title}
+                setTitle={setTitle}
+                editarTitulo={editarTitulo}
+                arteId={arteId}
+            />
             <Sidebar />
+            <canvas
+                ref={previewCanvasRef}
+                width={window.innerWidth - 60}
+                height={window.innerHeight - 60}
+                style={{
+                    marginLeft: '60px',
+                    marginTop: '60px',
+                    backgroundColor: 'transparent',
+                    position: 'absolute',
+                    pointerEvents: 'auto',
+                    zIndex: 0,
+                }}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
+            />
             <canvas
                 ref={mainCanvasRef}
                 width={window.innerWidth - 60}
@@ -188,12 +216,9 @@ const Paint = () => {
                     marginTop: '60px',
                     backgroundColor: '#fff',
                     position: 'absolute',
-                    zIndex: 0,
+                    pointerEvents: 'none',
+                    zIndex: 1,
                 }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
             />
         </div>
     );
