@@ -30,7 +30,7 @@ const RecentArtsContribution = () => {
             <ConteinerArtesRecentesSideBar>
                 <ContainerArtesRecentes>
                     <ContainerTitleButton>
-                        <Title align={"left"}>Artes Recentes</Title>
+                        <Title align={"left"}> Artes Recentes</Title>
                         <Button
                             width={"15%"}
                             Text={"+ Nova Arte"}
