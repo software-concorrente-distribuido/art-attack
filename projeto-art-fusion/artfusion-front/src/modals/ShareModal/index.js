@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Title from '../../components/Title';
 import user from '../../assets/images/man16_117721.svg';
@@ -7,6 +8,8 @@ import ModalOverlayContainer from '../../components/Containers/ModalOverlayConta
 import ContainerTitleExitEditPerfil from '../../components/Containers/ContainerTitleExitEditPerfil';
 import EditProfileModalContainer from '../../components/Containers/EditProfileModalContainer';
 import NomeEmailImgContainer from '../../components/Containers/NomeEmailImgContainer';
+import Button from '../../components/Button';
+import ApiShareArtsService from '../../services/apiShareArtsService'; 
 
 const IconExit = styled.img`
     width: 30px;
@@ -99,6 +102,20 @@ const SaveButton = styled.button`
     cursor: pointer;
 `;
 
+const InviteButton = styled.button`
+    margin-top: 16px;
+    padding: 8px 20px;
+    font-size: 16px;
+    height: 50px;
+    color: white;
+    background-color: #0f62fe;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    margin-left: 20px;
+`;
+
 const ModalHeader = styled.div`
     display: flex;
     justify-content: space-between;
@@ -110,9 +127,30 @@ const SectionTitle = styled(Title)`
     padding-top: 10px; /* Espaço abaixo dos títulos das seções */
 `;
 
+const AddParticipant = styled.input`
+  margin-top: 16px;
+  margin-bottom: 16px;
+  background-color: #F2F4F8;
+  border-radius: 5px;
+ 
+  width: 670px;
+  height: 48px;
+  padding-left: 20px; 
+  &::placeholder {
+    color: #697077; 
+  }
+`;
+
+const SectionAddParticipant = styled.section`
+  display: flex;
+  flex-direction: row;
+`;
+
 function ShareModal({ onClose }) {
+    const { arteId, salaUUID } = useParams();
     const [generalAccess, setGeneralAccess] = useState('only-added');
     const [isClosing, setIsClosing] = useState(false);
+    const [email, setEmail] = useState('');
     const modalRef = useRef(null);
 
     const handleAccessChange = (e) => {
@@ -135,6 +173,15 @@ function ShareModal({ onClose }) {
         }
     };
 
+    const handleInvite = async () => {
+        try {
+            const result = await ApiShareArtsService.compartilharArte(arteId, email);
+            alert('Participante convidado com sucesso!');
+        } catch (error) {
+            alert('Erro ao convidar o participante:', error);
+        }
+    };
+
     return (
         <ModalOverlayContainer
             onClick={handleOverlayClick}
@@ -151,6 +198,11 @@ function ShareModal({ onClose }) {
                     <IconExit src={exit} alt="exit" onClick={handleClose} />
                 </ModalHeader>
 
+                <SectionAddParticipant>
+                <AddParticipant type="email" id="email" name="email" placeholder="Digite o e-mail do participante" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <InviteButton onClick={handleInvite}> Convidar </InviteButton>
+                </SectionAddParticipant>
+
                 <SectionTitle size="20px" align="left">
                     Pessoas com acesso
                 </SectionTitle>
@@ -162,9 +214,8 @@ function ShareModal({ onClose }) {
                             <NomeEmailContainer>
                                 <Nome>Jane Doe</Nome>
                                 <Email>fulano@email.com</Email>
-                            </NomeEmailContainer>
-                        </NomeEmailImgContainer>
-
+                                </NomeEmailContainer>
+                            </NomeEmailImgContainer>
                         <PermissaoContainer>
                             <Permissao>Editor</Permissao>
                             <Reticencias>...</Reticencias>

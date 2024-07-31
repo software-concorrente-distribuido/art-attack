@@ -58,6 +58,11 @@ const RoutesApp = () => {
                         element={<ShareModal />}
                     />
 
+                    <Route 
+                        path="/share/:arteId" 
+                        element={<ShareModal />} 
+                    /> 
+
                     <Route path="*" element={<Login />} />
                     <Route
                         path="/paint/:arteId/:salaUUID"
