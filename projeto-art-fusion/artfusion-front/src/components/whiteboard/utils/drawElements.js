@@ -24,15 +24,20 @@ const drawCircle = (context, { x1, y1, x2, y2, lineWidth, color }) => {
     }
 };
 
-const drawTriangle = (
-    context,
-    { x1, y1, x2, y2, x3, y3, lineWidth, color }
-) => {
+const drawTriangle = (context, { x1, y1, x2, y2, lineWidth, color }) => {
+    // context.beginPath();
+    // context.moveTo(x1, y1);
+    // context.lineTo(x2, y2);
+    // context.lineTo(x3, y3);
+    // context.closePath(); // Fecha o caminho e conecta com o ponto de início
+    // context.strokeStyle = color;
+    // context.lineWidth = lineWidth;
+    // context.stroke();
     context.beginPath();
     context.moveTo(x1, y1);
     context.lineTo(x2, y2);
-    context.lineTo(x3, y3);
-    context.closePath(); // Fecha o caminho e conecta com o ponto de início
+    context.lineTo(x1 - (x2 - x1), y2);
+    context.closePath();
     context.strokeStyle = color;
     context.lineWidth = lineWidth;
     context.stroke();
@@ -51,13 +56,12 @@ const drawPencilElement = (context, element) => {
     context.globalCompositeOperation =
         element.type === toolTypes.ERASER ? 'destination-out' : 'source-over';
 
-
     const myStroke = getStroke(element.points, {
         size: element.lineWidth, // Tamanho fixo para todos os pontos
         thinning: 0, // Desabilita o afinamento baseado na velocidade ou pressão
         smoothing: 0.8,
         streamline: 0.5,
-        simulatePressure: false
+        simulatePressure: false,
     });
 
     const pathData = getSvgPathFromStroke(myStroke);
@@ -68,6 +72,8 @@ const drawPencilElement = (context, element) => {
 };
 
 export const drawElement = ({ context, element }) => {
+    // console.log('Contexto Recebido:', context); // Confirma o contexto
+    // console.log('Elemento Recebido:', element);
     try {
         if (element.type === toolTypes.ERASER) {
             context.globalCompositeOperation = 'destination-out'; // Define para apagar
@@ -87,12 +93,12 @@ export const drawElement = ({ context, element }) => {
             case toolTypes.ERASER:
                 drawPencilElement(context, element);
                 break;
-            // case toolTypes.CIRCLE:
-            //     drawCircle(context, element);
-            //     break;
-            // case toolTypes.TRIANGLE:
-            //     drawTriangle(context, element);
-            //     break;
+            case toolTypes.CIRCLE:
+                drawCircle(context, element);
+                break;
+            case toolTypes.TRIANGLE:
+                drawTriangle(context, element);
+                break;
             default:
                 throw new Error('Algo deu errado ao desenhar o elemento');
         }

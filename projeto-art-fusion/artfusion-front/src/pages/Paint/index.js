@@ -8,9 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { drawElement } from '../../components/whiteboard/utils';
 import { useSelector } from 'react-redux';
 import { toolTypes, actions } from '../../constants';
-import { updateElement } from '../../components/whiteboard/utils/updateElement';
 import { useUserId } from '../../hooks/useUserId';
-import { flushBuffer } from '../../components/whiteboard/utils/updateElement';
 import { v4 as uuid } from 'uuid';
 import apiServices from '../../services/apiServices';
 
@@ -25,14 +23,36 @@ const getAlteracaoEntradaDtoObject = (element, arteId, usuarioId) => {
 const Paint = () => {
     const mainCanvasRef = useRef(null);
     const previewCanvasRef = useRef(null);
+    const formCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [isFormDrawing, setIsFormDrawing] = useState(false);
     const [points, setPoints] = useState([]);
     const { arteId, salaUUID } = useParams();
+    const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [title, setTitle] = useState('Sem título');
     const toolType = useSelector((state) => state.whiteboard.tool);
     const lineWidth = useSelector((state) => state.whiteboard.lineWidth);
     const color = useSelector((state) => state.whiteboard.color);
     const userId = useUserId();
+    const containerRef = useRef(null);
+
+    const [zoomLevel, setZoomLevel] = useState(1);
+
+    const handleZoom = (event) => {
+        event.preventDefault();
+        const scaleAdjustment = event.deltaY > 0 ? 0.9 : 1.1;
+        const newZoomLevel = zoomLevel * scaleAdjustment;
+        setZoomLevel(Math.max(1, newZoomLevel));
+    };
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (zoomLevel < 1) setZoomLevel(1);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [zoomLevel]);
 
     useEffect(() => {
         const token = Cookies.get('user_token');
@@ -106,17 +126,26 @@ const Paint = () => {
     };
 
     const handleMouseDown = (e) => {
+        if (!toolType) {
+            console.log('Nenhuma ferramenta selecionada!');
+            return;
+        }
+
         const { offsetX, offsetY } = e.nativeEvent;
         setIsDrawing(true);
+        setStartPos({ x: offsetX, y: offsetY });
         setPoints([{ x: offsetX, y: offsetY }]);
 
-        const previewCanvas = previewCanvasRef.current;
-        const previewContext = previewCanvas.getContext('2d');
-
-        previewContext.strokeStyle = color;
-        previewContext.lineWidth = lineWidth;
-        previewContext.beginPath();
-        previewContext.moveTo(offsetX, offsetY);
+        if (
+            [
+                toolTypes.CIRCLE,
+                toolTypes.LINE,
+                toolTypes.SQUARE,
+                toolTypes.TRIANGLE,
+            ].includes(toolType)
+        ) {
+            setIsFormDrawing(true);
+        }
     };
 
     const handleMouseMove = (e) => {
@@ -124,52 +153,83 @@ const Paint = () => {
 
         const { offsetX, offsetY } = e.nativeEvent;
 
-        const previewCanvas = previewCanvasRef.current;
-        const previewContext = previewCanvas.getContext('2d');
+        const previewContext = previewCanvasRef.current.getContext('2d');
+
+        const formCanvas = formCanvasRef.current;
+        const formContext = formCanvas.getContext('2d');
 
         const newPoint = { x: offsetX, y: offsetY };
 
         let element;
 
-        if (points.length < 25) {
-            element = {
-                id: uuid(),
-                points: [...points, newPoint],
-                type: toolType,
-                lineWidth,
-                color,
-            };
+        if (toolType === toolTypes.PENCIL || toolType === toolTypes.ERASER) {
+            if (points.length < 25) {
+                element = {
+                    id: uuid(),
+                    points: [...points, newPoint],
+                    type: toolType,
+                    lineWidth,
+                    color,
+                };
 
-            setPoints((prevPoints) => [
-                ...prevPoints,
-                { x: offsetX, y: offsetY },
-            ]);
-        } else {
-            let newArr = [...points.slice(-3), newPoint];
+                setPoints((prevPoints) => [
+                    ...prevPoints,
+                    { x: offsetX, y: offsetY },
+                ]);
+            } else {
+                let newArr = [...points.slice(-3), newPoint];
 
-            element = {
-                id: uuid(),
-                points: newArr,
-                type: toolType,
-                lineWidth,
-                color,
-            };
+                element = {
+                    id: uuid(),
+                    points: newArr,
+                    type: toolType,
+                    lineWidth,
+                    color,
+                };
 
-            setPoints(newArr);
+                setPoints(newArr);
+            }
+
+            drawElement({
+                context: previewContext,
+                element: element,
+            });
+
+            const formatedData = getAlteracaoEntradaDtoObject(
+                element,
+                arteId,
+                userId
+            );
+
+            socketService.sendElementUpdate(salaUUID, formatedData);
         }
 
-        drawElement({
-            context: previewContext,
-            element: element,
-        });
+        if (
+            [
+                toolTypes.CIRCLE,
+                toolTypes.LINE,
+                toolTypes.SQUARE,
+                toolTypes.TRIANGLE,
+            ].includes(toolType)
+        ) {
+            element = {
+                id: uuid(),
+                x1: startPos.x,
+                y1: startPos.y,
+                x2: offsetX,
+                y2: offsetY,
+                type: toolType,
+                lineWidth,
+                color,
+            };
 
-        const formatedData = getAlteracaoEntradaDtoObject(
-            element,
-            arteId,
-            userId
-        );
+            formContext.clearRect(0, 0, formCanvas.width, formCanvas.height);
 
-        socketService.sendElementUpdate(salaUUID, formatedData);
+            drawElement({
+                context: formContext,
+                element: element,
+            });
+        }
     };
 
     const handleMouseUp = (e) => {
@@ -178,6 +238,51 @@ const Paint = () => {
         const { offsetX, offsetY } = e.nativeEvent;
         const newPoints = [...points, { x: offsetX, y: offsetY }];
 
+        const previewCanvas = previewCanvasRef.current;
+        const previewContext = previewCanvas.getContext('2d');
+
+        const formCanvas = formCanvasRef.current;
+        const formContext = formCanvas.getContext('2d');
+
+        if (!isFormDrawing) return;
+        if (
+            [
+                toolTypes.CIRCLE,
+                toolTypes.LINE,
+                toolTypes.SQUARE,
+                toolTypes.TRIANGLE,
+            ].includes(toolType)
+        ) {
+            const element = {
+                id: uuid(),
+                x1: startPos.x,
+                y1: startPos.y,
+                x2: offsetX,
+                y2: offsetY,
+                type: toolType,
+                lineWidth,
+                color,
+            };
+
+            formContext.clearRect(0, 0, formCanvas.width, formCanvas.height);
+
+            drawElement({
+                context: previewContext,
+                element: element,
+            });
+
+            const formatedData = getAlteracaoEntradaDtoObject(
+                element,
+                arteId,
+                userId
+            );
+
+            socketService.sendElementUpdate(salaUUID, formatedData);
+
+            setIsFormDrawing(false);
+        }
+
+        setStartPos([]);
         setPoints([]);
     };
 
@@ -190,36 +295,84 @@ const Paint = () => {
                 arteId={arteId}
             />
             <Sidebar />
-            <canvas
-                ref={previewCanvasRef}
-                width={window.innerWidth - 60}
-                height={window.innerHeight - 60}
+            <div
+                ref={containerRef}
                 style={{
+                    overflow: 'auto',
+                    position: 'relative',
                     marginLeft: '60px',
                     marginTop: '60px',
-                    backgroundColor: '#fff',
-                    position: 'absolute',
-                    pointerEvents: 'auto',
-                    zIndex: 0, // previewCanvasRef fica abaixo, usado para desenhos temporários/local
+                    width: '1280px',
+                    height: '650px',
+                    backgroundColor: '#000', // Cor de fundo para destacar a área do canvas
                 }}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-            />
-            <canvas
-                ref={mainCanvasRef}
-                width={window.innerWidth - 60}
-                height={window.innerHeight - 60}
-                style={{
-                    marginLeft: '60px',
-                    marginTop: '60px',
-                    backgroundColor: 'transparent',
-                    position: 'absolute',
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                }}
-            />
+                onWheel={handleZoom}
+            >
+                <div
+                    style={{
+                        width: `${1280 * zoomLevel}px`,
+                        height: `${650 * zoomLevel}px`,
+                        position: 'relative',
+                    }}
+                >
+                    <canvas
+                        ref={previewCanvasRef}
+                        width="1280"
+                        height="650"
+                        style={{
+                            // marginLeft: '60px',
+                            // marginTop: '60px',
+                            backgroundColor: '#fff',
+                            position: 'absolute',
+                            pointerEvents: 'auto',
+                            zIndex: 0, // previewCanvasRef fica abaixo, usado para desenhos temporários/local
+                            transform: `scale(${zoomLevel})`,
+                            transformOrigin: 'top left',
+                        }}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                        onWheel={handleZoom}
+                    />
+                    <canvas
+                        ref={formCanvasRef}
+                        width="1280"
+                        height="650"
+                        style={{
+                            // marginLeft: '60px',
+                            // marginTop: '60px',
+                            backgroundColor: 'transparent',
+                            position: 'absolute',
+                            pointerEvents: 'auto',
+                            zIndex: 2, // usdo para formas, fica abaixo do canva principal
+                            transform: `scale(${zoomLevel})`,
+                            transformOrigin: 'top left',
+                        }}
+                        onWheel={handleZoom}
+                        onMouseDown={handleMouseDown}
+                        onMouseMove={handleMouseMove}
+                        onMouseUp={handleMouseUp}
+                        onMouseLeave={handleMouseUp}
+                    />
+                    <canvas
+                        ref={mainCanvasRef}
+                        width="1280"
+                        height="650"
+                        style={{
+                            // marginLeft: '60px',
+                            // marginTop: '60px',
+                            backgroundColor: 'transparent',
+                            position: 'absolute',
+                            pointerEvents: 'none',
+                            zIndex: 1,
+                            transform: `scale(${zoomLevel})`,
+                            transformOrigin: 'top left',
+                        }}
+                        onWheel={handleZoom}
+                    />
+                </div>
+            </div>
         </div>
     );
 };
