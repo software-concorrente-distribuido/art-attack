@@ -52,7 +52,6 @@ public class SocketController {
     public void propagar(@Payload Message<AlteracaoEntradaDTO> msg, @DestinationVariable String uuid, Principal principal)  {
 
         try {
-            Thread.sleep(200);
             AlteracaoEntradaDTO alteracaoEntradaDTO = msg.getPayload();
 
             Sala sala = salaServico.obterSala(uuid);
