@@ -6,7 +6,7 @@ import user from '../../assets/images/man16_117721.svg';
 import exit from '../../assets/icons/delete-circled-outline.svg';
 import ModalOverlayContainer from '../../components/Containers/ModalOverlayContainer';
 import ContainerTitleExitEditPerfil from '../../components/Containers/ContainerTitleExitEditPerfil';
-import EditProfileModalContainer from '../../components/Containers/EditProfileModalContainer';
+import ShareModalContainer from '../../components/Containers/ShareModalContainer';
 import NomeEmailImgContainer from '../../components/Containers/NomeEmailImgContainer';
 import Button from '../../components/Button';
 import ApiShareArtsService from '../../services/apiShareArtsService'; 
@@ -176,6 +176,7 @@ function ShareModal({ onClose }) {
     const handleInvite = async () => {
         try {
             const result = await ApiShareArtsService.compartilharArte(arteId, email);
+            handleClose();
             alert('Participante convidado com sucesso!');
         } catch (error) {
             alert('Erro ao convidar o participante:', error);
@@ -187,7 +188,7 @@ function ShareModal({ onClose }) {
             onClick={handleOverlayClick}
             isClosing={isClosing}
         >
-            <EditProfileModalContainer
+            <ShareModalContainer
                 ref={modalRef}
                 onClick={(e) => e.stopPropagation()}
             >
@@ -202,8 +203,19 @@ function ShareModal({ onClose }) {
                 <AddParticipant type="email" id="email" name="email" placeholder="Digite o e-mail do participante" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <InviteButton onClick={handleInvite}> Convidar </InviteButton>
                 </SectionAddParticipant>
+                
+            </ShareModalContainer>
+        </ModalOverlayContainer>
 
-                <SectionTitle size="20px" align="left">
+      
+    );
+}
+
+export default ShareModal;
+
+/* 
+
+<SectionTitle size="20px" align="left">
                     Pessoas com acesso
                 </SectionTitle>
 
@@ -241,9 +253,7 @@ function ShareModal({ onClose }) {
                 </Dropdown>
 
                 <SaveButton onClick={handleSave}>Salvar</SaveButton>
-            </EditProfileModalContainer>
-        </ModalOverlayContainer>
-    );
-}
 
-export default ShareModal;
+*/
+
+
