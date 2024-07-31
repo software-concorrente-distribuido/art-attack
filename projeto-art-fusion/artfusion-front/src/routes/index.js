@@ -26,42 +26,35 @@ const RoutesApp = () => {
                 <Routes>
                     <Route
                         exact
-                        path="/home"
-                        element={<HomeTempo />} // deixar a rota home livre para implementação
-                        // element={<Private Item={HomeTempo} />}
+                        path="/home-tempo"
+                        element={<Private Item={HomeTempo} />}
                     />
                     <Route path="/login" element={<Login />} />
                     <Route exact path="/register" element={<Register />} />
 
-                    <Route exact path="/minhas-artes" element={<MyArts />} />
+                    <Route 
+                        exact 
+                        path="/minhas-artes" 
+                        element={<Private Item={MyArts} />}
+                    />
+
                     <Route
                         exact
                         path="/artes-compartilhadas"
-                        element={<SharedArts />}
+                        element={<Private Item={SharedArts} />}
                     />
 
                     <Route
                         exact
                         path="/artes-recentes"
-                        element={<RecentArtsPreview />}
+                        element={<Private Item={RecentArtsPreview} />}
                     />
 
                     <Route
                         exact
                         path="/perfil"
-                        element={<EditProfileModal />}
+                        element={<Private Item={EditProfileModal} />}
                     />
-
-                    <Route
-                        exact
-                        path="/ShareModal"
-                        element={<ShareModal />}
-                    />
-
-                    <Route 
-                        path="/share/:arteId" 
-                        element={<ShareModal />} 
-                    /> 
 
                     <Route path="*" element={<Login />} />
                     <Route

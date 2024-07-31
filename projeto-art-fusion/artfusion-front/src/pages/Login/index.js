@@ -28,7 +28,7 @@ const Login = () => {
             return;
         }
 
-        navigate('/home');
+        navigate('/artes-recentes');
 
     };
 
