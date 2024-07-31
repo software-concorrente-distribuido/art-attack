@@ -1,4 +1,7 @@
-## Trabalho Final da Disciplina de Software Concorrente e Distribuído!
+# Trabalho Final da Disciplina de Software Concorrente e Distribuído!
+
+## ArtFusion
+O ArtFusion é uma plataforma online de criação colaborativa de arte, projetada para artistas de todas as habilidades e estilos. Com o ArtFusion, os usuários podem criar, colaborar e compartilhar obras de arte digital em tempo real, conectando-se com outros artistas em todo o mundo. Com uma interface intuitiva e uma variedade de ferramentas de desenho e pintura, a plataforma permite que os usuários expressem sua criatividade de maneira flexível e dinâmica.
 
 ## Diagramas
 [CLIQUE AQUI](https://drive.google.com/file/d/1nSkpeHJiGiVqusFc7uL7A-Jva1d9B7br/view?usp=sharing)
