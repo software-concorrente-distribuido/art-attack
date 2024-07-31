@@ -20,12 +20,14 @@ const SideBarContainer = styled.div`
     padding-left: 16px; 
 `
 
+/* <PerfilSideBarHome></PerfilSideBarHome> */
+
 const SideBar = () => {
     return (
         <SideBarContainer>
             <LogoSideBarHome></LogoSideBarHome>
             <ItensSideBarHome></ItensSideBarHome>
-            <PerfilSideBarHome></PerfilSideBarHome>
+        
         </SideBarContainer>
     );
 };
