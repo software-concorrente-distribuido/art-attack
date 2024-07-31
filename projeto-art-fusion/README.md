@@ -18,20 +18,26 @@ O ArtFusion é uma plataforma online de criação colaborativa de arte, projetad
 - Tenha um postgres com um banco de dados chamado "art-attack" criado.
 
 ### Instalação
-- Clonar o repositório do projeto usando Git
+- Clonar o repositório do projeto usando Git:
 ```
 git clone https://github.com/software-concorrente-distribuido/art-attack
 ```
+
 - Navegar até o diretório `/projeto-art-fusion/backend` ou abrir o projeto em uma IDE de sua preferência.
-- No diretório `/projeto-art-fusion/backend`, abra o terminal e use o Docker Compose para iniciar o RabbitMQ
+  
+- No diretório `/projeto-art-fusion/backend`, abra o terminal e use o Docker Compose para iniciar o RabbitMQ:
 ```
 docker-compose up -d
 ```
-- Crie um arquivo chamado `application-dev.properties` e coloque as seguintes configurações nele:
-	spring.datasource.username=<seu_username_local> 
-	spring.datasource.password=<sua_senha_local>
+- Editar o `application-dev.properties` e alterar as seguintes configurações:
+```
+spring.datasource.username=<seu_username_local> 
+spring.datasource.password=<sua_senha_local>
+```
 	
-- Sete o Active Profile do IntelliJ para "dev". 	
+- Sete o Active Profile do IntelliJ para "dev".
+
+- Execute a aplicação.
 
 ## Guia de execução do frontend:
 
