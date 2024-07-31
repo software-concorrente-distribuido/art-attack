@@ -12,8 +12,21 @@ O ArtFusion é uma plataforma online de criação colaborativa de arte, projetad
 
 ## Guia de execução do backend:
 
-- JDK 21
+### Pré-requisitos
+- **Java 21**: Assegure-se de que a JDK 21 está instalada e configurada corretamente em seu sistema.
+- Ter o Docker instalado.
 - Tenha um postgres com um banco de dados chamado "art-attack" criado.
+
+### Instalação
+- Clonar o repositório do projeto usando Git
+```
+git clone https://github.com/software-concorrente-distribuido/art-attack
+```
+- Navegar até o diretório `/projeto-art-fusion/backend` ou abrir o projeto em uma IDE de sua preferência.
+- No diretório `/projeto-art-fusion/backend`, abra o terminal e use o Docker Compose para iniciar o RabbitMQ
+```
+docker-compose up -d
+```
 - Crie um arquivo chamado `application-dev.properties` e coloque as seguintes configurações nele:
 	spring.datasource.username=<seu_username_local> 
 	spring.datasource.password=<sua_senha_local>
@@ -22,15 +35,10 @@ O ArtFusion é uma plataforma online de criação colaborativa de arte, projetad
 
 ## Guia de execução do frontend:
 
-#### Pré-requisitos
-- Ter instalado o **Node.js**
-- Ter instalado o gerenciador de pacotes **npm**
+### Pré-requisitos
+- **Node.js e npm**: Certifique-se de ter o Node.js e npm instalados. Instalar [Node.js](https://nodejs.org/pt/download/package-manager) e [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
 
-#### Instalação
-- Clonar o repositório do projeto usando Git
-```
-git clone https://github.com/software-concorrente-distribuido/art-attack
-```
+### Instalação
   
 - Navegar até o diretório `/projeto-art-fusion/artfusion-front`
 - Instalar as dependências:
