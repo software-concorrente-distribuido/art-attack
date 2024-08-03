@@ -34,10 +34,16 @@ docker-compose up -d
 spring.datasource.username=<seu_username_local> 
 spring.datasource.password=<sua_senha_local>
 ```
-	
-- Sete o Active Profile do IntelliJ para "dev".
 
-- Execute a aplicação.
+- Utilizar o comando `docker-compose up` para iniciar o RabbitMQ.
+
+- Utilizar a task do Gradle para buildarm o projeto. No intelliJ basta ir para o painel direito e procurar a task equivalente ao comando `gradle build`
+  
+- Após buildado, com o RabbitMQ rodando (verifique em localhost:15672, user "joao", senha "hotwheels"), e com o Postgres rodando com o banco criado "art-attack" no shcema "public" (padrão), finalmente faça os dois últimos passos:
+	
+- - Sete o Active Profile do IntelliJ para "dev".
+
+- - Execute a aplicação.
 
 ## Guia de execução do frontend:
 
